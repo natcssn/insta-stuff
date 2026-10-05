@@ -197,15 +197,18 @@ app.get('/webhook', (req, res) => {
  */
 app.post('/webhook', (req, res) => {
   const body = req.body;
+  console.log(`📡 [Webhook Inbound] ${new Date().toISOString()} | Object: ${body?.object}`);
 
-  if (body.object === 'instagram') {
-    // Respond immediately to Meta
+  if (body.object === 'instagram' || body.object === 'page') {
+    // Acknowledge immediately to Meta
     res.status(200).send('EVENT_RECEIVED');
 
     if (Array.isArray(body.entry)) {
       for (const entry of body.entry) {
+        // Handle Instagram changes (comments, mentions)
         if (Array.isArray(entry.changes)) {
           for (const change of entry.changes) {
+            console.log(`🔔 [Webhook Change] Field: "${change.field}" | ID: ${change.value?.id}`);
             if (change.field === 'comments') {
               bot.handleCommentEvent(change.value);
             }
@@ -214,7 +217,8 @@ app.post('/webhook', (req, res) => {
       }
     }
   } else {
-    res.sendStatus(404);
+    console.warn('⚠️ [Webhook Ignored] Unrecognized object type:', body?.object);
+    res.status(200).send('IGNORED');
   }
 });
 
