@@ -6,6 +6,7 @@ const config = require('./config');
 const db = require('./db');
 const bot = require('./bot');
 const instagramApi = require('./instagramApi');
+const poller = require('./poller');
 
 const app = express();
 
@@ -269,4 +270,7 @@ app.listen(config.PORT, () => {
 
   // Ensure Meta Webhooks are actively subscribed for this Instagram Account
   instagramApi.subscribeApp();
+
+  // Start autonomous real-time poller (7s interval fallback)
+  poller.startPoller(7000);
 });
