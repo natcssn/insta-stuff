@@ -271,6 +271,6 @@ app.listen(config.PORT, () => {
   // Ensure Meta Webhooks are actively subscribed for this Instagram Account
   instagramApi.subscribeApp();
 
-  // Start autonomous real-time poller (7s interval fallback)
-  poller.startPoller(7000);
+  // Background poller disabled per user instruction
+  // poller.startPoller(7000);
 });
