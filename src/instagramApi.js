@@ -90,6 +90,8 @@ async function getMyRecentMedia() {
     console.error('[Meta API Error] Failed to fetch recent media:', error.response?.data || error.message);
     return [];
   }
+}
+
 /**
  * Automatically subscribe the Instagram Business Account to this app's webhooks.
  */
