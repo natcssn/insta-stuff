@@ -92,7 +92,57 @@ function recordComment({
   );
 }
 
-// ---------------- CAMPAIGN MANAGEMENT ----------------
+// ---------------- CAMPAIGN MANAGEMENT & PERSISTENCE ----------------
+const backupPath = path.join(__dirname, '..', 'campaigns_backup.json');
+
+function saveCampaignsBackup() {
+  try {
+    const all = db.prepare('SELECT * FROM campaigns').all();
+    fs.writeFileSync(backupPath, JSON.stringify(all, null, 2));
+  } catch (err) {
+    console.warn('Could not save campaigns backup:', err.message);
+  }
+}
+
+function restoreCampaignsFromBackup() {
+  try {
+    const count = db.prepare('SELECT COUNT(*) as count FROM campaigns').get().count;
+    if (count === 0) {
+      if (fs.existsSync(backupPath)) {
+        const data = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
+        if (Array.isArray(data) && data.length > 0) {
+          const insertStmt = db.prepare(`
+            INSERT INTO campaigns (id, title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+          for (const c of data) {
+            insertStmt.run(c.id, c.title, c.media_id, c.post_url, c.trigger_keywords, c.dm_text, c.public_reply, c.is_active, c.created_at || new Date().toISOString());
+          }
+          console.log(`✅ [Database] Restored ${data.length} campaign(s) from persistent backup.`);
+          return;
+        }
+      }
+
+      // Default fallback campaign if no backup exists
+      db.prepare(`
+        INSERT INTO campaigns (title, media_id, trigger_keywords, dm_text, public_reply, is_active)
+        VALUES (?, ?, ?, ?, ?, 1)
+      `).run(
+        'GLOBAL_AUTONOMY',
+        null,
+        'peak, hi, link, guide, code, *',
+        'Hey there! 🎉 Thanks for your comment. Here is your requested resource:\n\n👉 https://natcindustries.com\n\nEnjoy!',
+        'Check your dms yo ❤️‍🔥'
+      );
+      saveCampaignsBackup();
+    }
+  } catch (err) {
+    console.warn('Could not restore campaigns:', err.message);
+  }
+}
+
+// Restore on boot
+restoreCampaignsFromBackup();
 
 function createCampaign({ title, mediaId, postUrl, triggerKeywords, dmText, publicReply }) {
   const stmt = db.prepare(`
@@ -100,6 +150,7 @@ function createCampaign({ title, mediaId, postUrl, triggerKeywords, dmText, publ
     VALUES (?, ?, ?, ?, ?, ?, 1)
   `);
   const info = stmt.run(title, mediaId || null, postUrl || null, triggerKeywords, dmText, publicReply || null);
+  saveCampaignsBackup();
   return getCampaignById(info.lastInsertRowid);
 }
 
@@ -132,11 +183,13 @@ function findCampaignForMedia(mediaId, postUrl = null) {
 
 function toggleCampaign(id, isActive) {
   db.prepare('UPDATE campaigns SET is_active = ? WHERE id = ?').run(isActive ? 1 : 0, id);
+  saveCampaignsBackup();
   return getCampaignById(id);
 }
 
 function deleteCampaign(id) {
   db.prepare('DELETE FROM campaigns WHERE id = ?').run(id);
+  saveCampaignsBackup();
   return { success: true };
 }
 
