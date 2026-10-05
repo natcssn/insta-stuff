@@ -1,24 +1,13 @@
 [
   {
     "id": 1,
-    "title": "Hi temp",
+    "title": "STARTUP_REEL_AUTONOMY",
     "media_id": "17906571819546262",
     "post_url": null,
-    "trigger_keywords": "Hi, peak",
+    "trigger_keywords": "peak, hi",
     "dm_text": "Hi this is nat bot ✌",
     "public_reply": "Check your dms yo ❤️‍🔥",
-    "is_active": 0,
+    "is_active": 1,
     "created_at": "2026-10-05 08:30:00"
-  },
-  {
-    "id": 2,
-    "title": "GLOBAL_AUTONOMY",
-    "media_id": null,
-    "post_url": null,
-    "trigger_keywords": "peak, link, guide",
-    "dm_text": "Hey there! 🎉 Thanks for your comment. Here is your requested resource:\n\n👉 https://natcindustries.com\n\nEnjoy!",
-    "public_reply": "Check your dms yo ❤️‍🔥",
-    "is_active": 0,
-    "created_at": "2026-10-05 08:00:00"
   }
 ]

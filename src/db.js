@@ -122,19 +122,6 @@ function restoreCampaignsFromBackup() {
           return;
         }
       }
-
-      // Default fallback campaign if no backup exists
-      db.prepare(`
-        INSERT INTO campaigns (title, media_id, trigger_keywords, dm_text, public_reply, is_active)
-        VALUES (?, ?, ?, ?, ?, 1)
-      `).run(
-        'GLOBAL_AUTONOMY',
-        null,
-        'peak, hi, link, guide, code, *',
-        'Hey there! 🎉 Thanks for your comment. Here is your requested resource:\n\n👉 https://natcindustries.com\n\nEnjoy!',
-        'Check your dms yo ❤️‍🔥'
-      );
-      saveCampaignsBackup();
     }
   } catch (err) {
     console.warn('Could not restore campaigns:', err.message);
@@ -174,10 +161,6 @@ function findCampaignForMedia(mediaId, postUrl = null) {
     const urlMatch = db.prepare('SELECT * FROM campaigns WHERE post_url = ? AND is_active = 1').get(postUrl);
     if (urlMatch) return urlMatch;
   }
-  // Global campaign fallback: matches any reel or post when media_id is empty or null
-  const globalMatch = db.prepare("SELECT * FROM campaigns WHERE (media_id IS NULL OR media_id = '' OR media_id = 'ALL') AND is_active = 1 ORDER BY id DESC LIMIT 1").get();
-  if (globalMatch) return globalMatch;
-
   return null;
 }
 

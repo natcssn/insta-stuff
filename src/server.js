@@ -1,12 +1,12 @@
 const express = require('express');
 const path = require('path');
+const https = require('https');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const config = require('./config');
 const db = require('./db');
 const bot = require('./bot');
 const instagramApi = require('./instagramApi');
-const poller = require('./poller');
 
 const app = express();
 
@@ -104,6 +104,9 @@ app.get(['/dashboard', '/dashboard.html', '/index.html'], (req, res) => {
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // ---------------- REST API FOR DASHBOARD UI ----------------
+app.get('/api/ping', (req, res) => {
+  res.status(200).send('PONG');
+});
 
 // Get stats
 app.get('/api/stats', (req, res) => {
@@ -271,6 +274,11 @@ app.listen(config.PORT, () => {
   // Ensure Meta Webhooks are actively subscribed for this Instagram Account
   instagramApi.subscribeApp();
 
-  // Background poller disabled per user instruction
-  // poller.startPoller(7000);
+  // Self-Ping Keep-Alive: Ping every 8 minutes so Render free tier stays awake 24/7
+  setInterval(() => {
+    try {
+      const url = process.env.RENDER_EXTERNAL_URL || 'https://insta-stuff.onrender.com';
+      https.get(`${url}/api/ping`, () => {}).on('error', () => {});
+    } catch (_) {}
+  }, 8 * 60 * 1000);
 });

@@ -9,9 +9,6 @@ const queue = require('./messageQueue');
 function matchesKeywords(text, keywordsArray) {
   if (!text || !keywordsArray || keywordsArray.length === 0) return false;
   const normalized = String(text).toLowerCase().trim();
-  
-  // Wildcard support: if "*" is configured, match any comment
-  if (keywordsArray.includes('*')) return true;
 
   return keywordsArray.some(keyword => {
     const trimmed = String(keyword).trim().toLowerCase();
