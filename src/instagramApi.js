@@ -90,10 +90,30 @@ async function getMyRecentMedia() {
     console.error('[Meta API Error] Failed to fetch recent media:', error.response?.data || error.message);
     return [];
   }
+/**
+ * Automatically subscribe the Instagram Business Account to this app's webhooks.
+ */
+async function subscribeApp() {
+  if (!config.PAGE_ACCESS_TOKEN || !config.INSTAGRAM_ACCOUNT_ID) return;
+  try {
+    const url = `${BASE_URL}/${config.INSTAGRAM_ACCOUNT_ID}/subscribed_apps`;
+    const res = await axios.post(url, null, {
+      params: {
+        subscribed_fields: 'comments,mentions,messages',
+        access_token: config.PAGE_ACCESS_TOKEN
+      }
+    });
+    console.log('✅ [Meta Handshake] Instagram Account subscribed to Webhooks:', res.data);
+    return res.data;
+  } catch (err) {
+    console.warn('⚠️ [Meta Handshake] Auto-subscribe notice:', err.response?.data?.error?.message || err.message);
+  }
 }
 
 module.exports = {
   replyToComment,
   sendPrivateReply,
-  getMyRecentMedia
+  getMyRecentMedia,
+  subscribeApp
 };
+

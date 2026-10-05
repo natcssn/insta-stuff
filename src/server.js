@@ -266,4 +266,7 @@ app.listen(config.PORT, () => {
   console.log(`🖥️  Local Dashboard UI: http://localhost:${config.PORT}`);
   console.log(`🔑 Verification Token: "${config.VERIFY_TOKEN}"`);
   console.log(`==================================================\n`);
+
+  // Ensure Meta Webhooks are actively subscribed for this Instagram Account
+  instagramApi.subscribeApp();
 });
