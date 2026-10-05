@@ -180,10 +180,10 @@
       background: rgba(0, 0, 0, 0.65);
       border: 1px solid var(--border-subtle);
       border-radius: 5px;
-      padding: 12px 14px;
+      padding: 14px 16px;
       color: var(--text-bright);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: 16px; /* Prevents iOS auto-zoom */
       outline: none;
       transition: all 0.25s ease;
     }
@@ -199,9 +199,10 @@
       color: #04070d;
       border: none;
       border-radius: 5px;
-      padding: 14px;
+      padding: 15px;
+      min-height: 48px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -209,6 +210,9 @@
       margin-top: 10px;
       box-shadow: 0 0 24px var(--accent-glow);
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn-submit:hover {
@@ -241,6 +245,27 @@
       0%, 100% { transform: translateX(0); }
       20%, 60% { transform: translateX(-6px); }
       40%, 80% { transform: translateX(6px); }
+    }
+
+    /* Mobile Phone Optimizations */
+    @media (max-width: 480px) {
+      body {
+        padding: 16px;
+      }
+      .login-card {
+        padding: 28px 18px;
+      }
+      .brand-title {
+        font-size: 18px;
+      }
+      .brand-sub {
+        font-size: 9.5px;
+      }
+      .arc-reactor {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 14px;
+      }
     }
   </style>
 </head>
