@@ -67,9 +67,9 @@ app.get('/api/auth/check', (req, res) => {
   res.json({ authenticated: isRequestAuthenticated(req) });
 });
 
-// Protect all internal API routes (except /api/auth/*)
+// Protect all internal API routes (except /api/auth/* and /api/ping)
 app.use('/api', (req, res, next) => {
-  if (req.path.startsWith('/auth/')) return next();
+  if (req.path.startsWith('/auth/') || req.path === '/ping') return next();
   if (!isRequestAuthenticated(req)) {
     return res.status(401).json({ error: 'Security clearance required' });
   }
