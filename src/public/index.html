@@ -330,6 +330,13 @@
       border-bottom: 1px solid var(--border-subtle);
     }
 
+    .panel-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
     .panel-title {
       font-family: 'Orbitron', monospace;
       font-size: 15px;
@@ -1011,6 +1018,24 @@
       .campaign-hud-card {
         padding: 16px 14px;
       }
+      .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .panel-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+
+      .panel-actions .stark-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 10px;
+        font-size: 10px;
+      }
 
       .camp-title {
         font-size: 14px;
@@ -1193,9 +1218,14 @@
           <div class="panel-reticle"></div>
           ACTIVE TARGET CAMPAIGNS
         </div>
-        <button class="stark-btn stark-btn-primary" onclick="openNewCampaignModal()">
-          + INITIALIZE PROTOCOL
-        </button>
+        <div class="panel-actions">
+          <button class="stark-btn stark-btn-outline" onclick="openDefaultsModal()" title="Configure Standard Protocol Defaults">
+            ⚙ PROTOCOL DEFAULTS
+          </button>
+          <button class="stark-btn stark-btn-primary" onclick="openNewCampaignModal()">
+            + INITIALIZE PROTOCOL
+          </button>
+        </div>
       </div>
 
       <div class="campaigns-container" id="campaigns-container">
@@ -1245,6 +1275,22 @@
       <div class="modal-sub">CONFIGURE AUTOMATIC INSTAGRAM COMMENT-TO-DM FLOW</div>
 
       <form id="campaignForm" onsubmit="handleSaveCampaign(event)">
+        <!-- Draft Auto-Saver & Default Presets Helper Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 240, 255, 0.06); border: 1px dashed rgba(0, 240, 255, 0.25); border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-core);">
+            <span id="draftIndicatorDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--accent-core); box-shadow: 0 0 8px var(--accent-core); display: inline-block;"></span>
+            <span id="draftStatusText">AUTO-SAVE ACTIVE</span>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button type="button" class="chip-btn" onclick="applyDefaultPresets()" style="color: var(--accent-core); border-color: var(--accent-core); font-weight: 700; padding: 6px 12px;" title="Auto-fill inputs with configured default values">
+              ⚡ LOAD PRESET DEFAULTS
+            </button>
+            <button type="button" class="chip-btn" onclick="clearDraft(true)" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.4); padding: 6px 10px;" title="Reset all input fields and clear saved draft">
+              ✕ CLEAR DRAFT
+            </button>
+          </div>
+        </div>
+
         <!-- Step 1: Codename -->
         <div class="form-step-section">
           <div class="step-heading">
@@ -1334,6 +1380,60 @@
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
           <button type="button" class="stark-btn stark-btn-outline" onclick="closeModal()">CANCEL</button>
           <button type="submit" class="stark-btn stark-btn-primary">DEPLOY PROTOCOL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- PROTOCOL DEFAULTS CONFIGURATION MODAL -->
+  <div class="modal-backdrop" id="defaultsModal">
+    <div class="modal-frame hud-frame">
+      <div class="modal-title-row">
+        <div class="modal-title">⚙ PROTOCOL DEFAULTS</div>
+        <button class="modal-close-x" onclick="closeDefaultsModal()">✕</button>
+      </div>
+      <div class="modal-sub">CONFIGURE STANDARD VALUES TO 1-CLICK AUTO-FILL NEW PROTOCOLS</div>
+
+      <form id="defaultsForm" onsubmit="handleSaveDefaults(event)">
+        <!-- Default Step 1: Codename Prefix -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">1</span> DEFAULT CODENAME / PREFIX
+          </div>
+          <input type="text" id="defTitle" placeholder="e.g. PEAK_REEL_AUTONOMY">
+          <div class="field-hint">Auto-fills the campaign name in Initialize Protocol.</div>
+        </div>
+
+        <!-- Default Step 2: Trigger Keywords -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">2</span> DEFAULT TRIGGER KEYWORDS
+          </div>
+          <input type="text" id="defKeywords" placeholder="e.g. peak, link, guide">
+          <div class="field-hint">Comma-separated triggers to automatically insert.</div>
+        </div>
+
+        <!-- Default Step 3: Private DM Payload -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">3</span> DEFAULT PRIVATE DM PAYLOAD
+          </div>
+          <textarea id="defDmText" rows="4" placeholder="Greetings! Here is the resource you asked for:&#10;&#10;https://yourlink.com"></textarea>
+          <div class="field-hint">Standard DM message body for fast dispatch.</div>
+        </div>
+
+        <!-- Default Step 4: Public Comment Reply -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">4</span> DEFAULT PUBLIC COMMENT REPLY
+          </div>
+          <input type="text" id="defPublicReply" placeholder="Sent to your DMs! Check your inbox ✨">
+          <div class="field-hint">Standard public acknowledgement comment.</div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="stark-btn stark-btn-outline" onclick="closeDefaultsModal()">CANCEL</button>
+          <button type="submit" class="stark-btn stark-btn-primary">SAVE DEFAULTS</button>
         </div>
       </form>
     </div>
@@ -1645,6 +1745,7 @@
         caption.textContent = (media.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
         idText.textContent = `Node ID: ${media.id}`;
       }
+      saveDraft();
     }
 
     function clearTargetReel() {
@@ -1656,6 +1757,7 @@
       document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
       const banner = document.getElementById('lockedReelBanner');
       if (banner) banner.style.display = 'none';
+      saveDraft();
     }
 
     function selectGlobalReels() {
@@ -1675,6 +1777,7 @@
         caption.textContent = 'GLOBAL TARGET: ALL REELS & POSTS';
         idText.textContent = 'Auto-reply triggers across every reel & post';
       }
+      saveDraft();
     }
 
     function applyManualMedia() {
@@ -1695,6 +1798,7 @@
         caption.textContent = `TARGET: ${val}`;
         idText.textContent = 'Custom Node / URL Locked';
       }
+      saveDraft();
     }
 
     function addKeywordPreset(kw) {
@@ -1705,6 +1809,7 @@
         existing.push(kw);
         input.value = existing.join(', ');
       }
+      saveDraft();
     }
 
     function updateDmPreview(val) {
@@ -1712,17 +1817,184 @@
       bubble.textContent = val.trim() || 'Type above to see live preview...';
     }
 
-    function openNewCampaignModal() {
-      playSfx('click');
+    /* ==========================================================================
+       PROTOCOL INPUT STATE DRAFT SAVER & PERSISTENCE
+       ========================================================================== */
+    const DRAFT_KEY = 'natc_protocol_draft';
+    const DEFAULTS_KEY = 'natc_protocol_defaults';
+
+    function saveDraft() {
+      const draft = {
+        title: document.getElementById('campTitle')?.value || '',
+        mediaId: document.getElementById('campMediaId')?.value || '',
+        manualMedia: document.getElementById('manualMediaInput')?.value || '',
+        keywords: document.getElementById('campKeywords')?.value || '',
+        dmText: document.getElementById('campDmText')?.value || '',
+        publicReply: document.getElementById('campPublicReply')?.value || '',
+        updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      };
+
+      if (draft.title || draft.mediaId || draft.manualMedia || draft.keywords || draft.dmText || draft.publicReply) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        const statusEl = document.getElementById('draftStatusText');
+        const dotEl = document.getElementById('draftIndicatorDot');
+        if (statusEl) statusEl.textContent = `SAVED (${draft.updatedAt})`;
+        if (dotEl) dotEl.style.background = 'var(--accent-core)';
+      }
+    }
+
+    function restoreDraft() {
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return false;
+        const draft = JSON.parse(raw);
+        if (!draft) return false;
+
+        let hasData = false;
+        if (draft.title) {
+          document.getElementById('campTitle').value = draft.title;
+          hasData = true;
+        }
+        if (draft.keywords) {
+          document.getElementById('campKeywords').value = draft.keywords;
+          hasData = true;
+        }
+        if (draft.dmText) {
+          document.getElementById('campDmText').value = draft.dmText;
+          updateDmPreview(draft.dmText);
+          hasData = true;
+        }
+        if (draft.publicReply) {
+          document.getElementById('campPublicReply').value = draft.publicReply;
+          hasData = true;
+        }
+        if (draft.manualMedia) {
+          const mInput = document.getElementById('manualMediaInput');
+          if (mInput) mInput.value = draft.manualMedia;
+        }
+
+        if (draft.mediaId) {
+          hasData = true;
+          document.getElementById('campMediaId').value = draft.mediaId;
+          selectedMediaId = draft.mediaId;
+
+          const media = (recentMediaCache || []).find(m => m.id === draft.mediaId);
+          const banner = document.getElementById('lockedReelBanner');
+          const thumb = document.getElementById('lockedThumb');
+          const caption = document.getElementById('lockedCaption');
+          const idText = document.getElementById('lockedIdText');
+
+          if (banner) {
+            banner.style.display = 'flex';
+            if (media) {
+              thumb.src = media.thumbnail_url || media.media_url || '';
+              caption.textContent = (media.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
+              idText.textContent = `Node ID: ${media.id}`;
+            } else {
+              thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="16" font-family="monospace" text-anchor="middle" fill="%2300f0ff">ID</text></svg>';
+              caption.textContent = `TARGET: ${draft.mediaId}`;
+              idText.textContent = 'Custom Node Locked';
+            }
+          }
+
+          document.querySelectorAll('.media-card-item').forEach(item => {
+            if (item.getAttribute('onclick')?.includes(draft.mediaId)) {
+              item.classList.add('selected');
+            }
+          });
+        }
+
+        const statusEl = document.getElementById('draftStatusText');
+        if (statusEl && hasData) {
+          statusEl.textContent = draft.updatedAt ? `DRAFT RESTORED (${draft.updatedAt})` : 'DRAFT RESTORED';
+        }
+        return hasData;
+      } catch (e) {
+        console.warn('Draft restoration error:', e);
+        return false;
+      }
+    }
+
+    function clearDraft(notify = true) {
+      if (notify) playSfx('click');
+      localStorage.removeItem(DRAFT_KEY);
       document.getElementById('campaignForm').reset();
       clearTargetReel();
       document.getElementById('dmPreviewBubble').textContent = 'Type above to see live preview...';
+      const statusEl = document.getElementById('draftStatusText');
+      if (statusEl) statusEl.textContent = 'DRAFT CLEARED';
+    }
+
+    /* ==========================================================================
+       PROTOCOL DEFAULTS PRESETS MANAGER
+       ========================================================================== */
+    function openDefaultsModal() {
+      playSfx('click');
+      try {
+        const raw = localStorage.getItem(DEFAULTS_KEY);
+        if (raw) {
+          const defs = JSON.parse(raw);
+          if (defs.title) document.getElementById('defTitle').value = defs.title;
+          if (defs.keywords) document.getElementById('defKeywords').value = defs.keywords;
+          if (defs.dmText) document.getElementById('defDmText').value = defs.dmText;
+          if (defs.publicReply) document.getElementById('defPublicReply').value = defs.publicReply;
+        }
+      } catch (e) {}
+      document.getElementById('defaultsModal').style.display = 'flex';
+    }
+
+    function closeDefaultsModal() {
+      playSfx('click');
+      document.getElementById('defaultsModal').style.display = 'none';
+    }
+
+    function handleSaveDefaults(e) {
+      e.preventDefault();
+      playSfx('deploy');
+      const defaults = {
+        title: document.getElementById('defTitle').value.trim(),
+        keywords: document.getElementById('defKeywords').value.trim(),
+        dmText: document.getElementById('defDmText').value.trim(),
+        publicReply: document.getElementById('defPublicReply').value.trim()
+      };
+      localStorage.setItem(DEFAULTS_KEY, JSON.stringify(defaults));
+      closeDefaultsModal();
+      alert('✓ Protocol presets saved! Click "⚡ LOAD PRESET DEFAULTS" inside any protocol initialization to auto-fill.');
+    }
+
+    function applyDefaultPresets() {
+      playSfx('click');
+      try {
+        const raw = localStorage.getItem(DEFAULTS_KEY);
+        if (!raw) {
+          alert('No default presets found. Configure them first via "⚙ PROTOCOL DEFAULTS" on the main dashboard.');
+          return;
+        }
+        const defs = JSON.parse(raw);
+        if (defs.title) document.getElementById('campTitle').value = defs.title;
+        if (defs.keywords) document.getElementById('campKeywords').value = defs.keywords;
+        if (defs.dmText) {
+          document.getElementById('campDmText').value = defs.dmText;
+          updateDmPreview(defs.dmText);
+        }
+        if (defs.publicReply) document.getElementById('campPublicReply').value = defs.publicReply;
+        saveDraft();
+      } catch (e) {
+        console.error('Error applying presets:', e);
+      }
+    }
+
+    function openNewCampaignModal() {
+      playSfx('click');
       document.getElementById('campaignModal').style.display = 'flex';
-      loadRecentMedia();
+      loadRecentMedia().then(() => {
+        restoreDraft();
+      });
     }
 
     function closeModal() {
       playSfx('click');
+      saveDraft(); // Persist typed inputs when modal is closed!
       document.getElementById('campaignModal').style.display = 'none';
     }
 
@@ -1745,6 +2017,7 @@
           body: JSON.stringify(payload)
         });
         if (res.ok) {
+          clearDraft(false); // SUCCESS: Draft is cleared ONLY after protocol is successfully launched!
           closeModal();
           loadCampaigns();
           loadStats();
@@ -1805,6 +2078,15 @@
       if (!text) return '';
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
+
+    // Attach real-time draft persistence listeners to form inputs
+    ['campTitle', 'campKeywords', 'campDmText', 'campPublicReply', 'manualMediaInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', saveDraft);
+        el.addEventListener('change', saveDraft);
+      }
+    });
 
     // Initial boot sequence
     loadStats();
