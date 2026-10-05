@@ -765,9 +765,11 @@
       gap: 10px;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 6px 4px 12px;
+      padding: 8px 6px 12px;
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;
+      overscroll-behavior-x: contain;
       border: 1px solid var(--border-subtle);
       border-radius: 8px;
       background: rgba(0, 0, 0, 0.55);
@@ -780,8 +782,10 @@
       border-radius: 4px;
     }
     .media-card-item {
-      flex: 0 0 105px;
-      width: 105px;
+      flex: 0 0 100px;
+      width: 100px;
+      min-width: 100px;
+      max-width: 100px;
       scroll-snap-align: start;
       border: 1px solid var(--border-subtle);
       border-radius: 6px;
@@ -791,6 +795,8 @@
       transition: all 0.2s ease;
       text-align: center;
       position: relative;
+      user-select: none;
+      -webkit-user-select: none;
     }
     .media-card-item:hover {
       border-color: var(--accent-core);
@@ -1117,6 +1123,23 @@
         display: block;
       }
 
+      .media-hud-carousel {
+        padding: 6px 4px 10px;
+        gap: 8px;
+      }
+
+      .media-card-item {
+        flex: 0 0 92px;
+        width: 92px;
+        min-width: 92px;
+        max-width: 92px;
+        padding: 5px;
+      }
+
+      .media-thumb {
+        height: 112px;
+      }
+
       .telemetry-table th, .telemetry-table td {
         padding: 10px 12px;
         font-size: 10px;
@@ -1307,6 +1330,11 @@
             <div class="media-hud-carousel" id="mediaPickerGrid">
               <div style="padding: 24px; text-align: center; color: var(--text-dim); width: 100%;">Connecting to Meta Media Inventory...</div>
             </div>
+          </div>
+
+          <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center;">
+            <input type="text" id="manualMediaInput" placeholder="Or paste Reel link or ID..." style="font-size: 13px !important; padding: 8px 10px; margin-bottom: 0; flex: 1;">
+            <button type="button" class="chip-btn" style="white-space: nowrap; padding: 8px 12px; font-weight: 700; color: var(--accent-core); border-color: var(--accent-core);" onclick="applyManualMedia()">LOCK ID</button>
           </div>
 
           <input type="hidden" id="campMediaId">
@@ -1695,14 +1723,50 @@
       playSfx('click');
       selectedMediaId = null;
       document.getElementById('campMediaId').value = '';
+      const manualInput = document.getElementById('manualMediaInput');
+      if (manualInput) manualInput.value = '';
       document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
       const banner = document.getElementById('lockedReelBanner');
       if (banner) banner.style.display = 'none';
     }
 
     function selectGlobalReels() {
-      clearTargetReel();
-      alert('Global Target Enabled: This protocol will trigger across all Reels & posts on your account.');
+      playSfx('click');
+      selectedMediaId = '';
+      document.getElementById('campMediaId').value = '';
+      const manualInput = document.getElementById('manualMediaInput');
+      if (manualInput) manualInput.value = '';
+      document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
+      const banner = document.getElementById('lockedReelBanner');
+      const thumb = document.getElementById('lockedThumb');
+      const caption = document.getElementById('lockedCaption');
+      const idText = document.getElementById('lockedIdText');
+      if (banner) {
+        banner.style.display = 'flex';
+        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="22" text-anchor="middle" fill="%2300f0ff">★</text></svg>';
+        caption.textContent = 'GLOBAL TARGET: ALL REELS & POSTS';
+        idText.textContent = 'Auto-reply triggers across every reel & post';
+      }
+    }
+
+    function applyManualMedia() {
+      const input = document.getElementById('manualMediaInput');
+      if (!input || !input.value.trim()) return;
+      playSfx('click');
+      let val = input.value.trim();
+      selectedMediaId = val;
+      document.getElementById('campMediaId').value = val;
+      document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
+      const banner = document.getElementById('lockedReelBanner');
+      const thumb = document.getElementById('lockedThumb');
+      const caption = document.getElementById('lockedCaption');
+      const idText = document.getElementById('lockedIdText');
+      if (banner) {
+        banner.style.display = 'flex';
+        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="16" font-family="monospace" text-anchor="middle" fill="%2300f0ff">ID</text></svg>';
+        caption.textContent = `TARGET: ${val}`;
+        idText.textContent = 'Custom Node / URL Locked';
+      }
     }
 
     function addKeywordPreset(kw) {

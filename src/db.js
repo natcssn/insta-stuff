@@ -123,6 +123,10 @@ function findCampaignForMedia(mediaId, postUrl = null) {
     const urlMatch = db.prepare('SELECT * FROM campaigns WHERE post_url = ? AND is_active = 1').get(postUrl);
     if (urlMatch) return urlMatch;
   }
+  // Global campaign fallback: matches any reel or post when media_id is empty or null
+  const globalMatch = db.prepare("SELECT * FROM campaigns WHERE (media_id IS NULL OR media_id = '' OR media_id = 'ALL') AND is_active = 1 ORDER BY id DESC LIMIT 1").get();
+  if (globalMatch) return globalMatch;
+
   return null;
 }
 
