@@ -744,28 +744,53 @@
       font-weight: 700;
     }
 
-    /* Media Selector Grid */
-    .media-hud-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    /* Media Horizontal Swipe Carousel */
+    .media-carousel-container {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .media-carousel-swipe-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      color: var(--accent-core);
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .media-hud-carousel {
+      display: flex;
       gap: 10px;
-      max-height: 180px;
-      overflow-y: auto;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.5);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 4px 12px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.55);
+    }
+    .media-hud-carousel::-webkit-scrollbar {
+      height: 4px;
+    }
+    .media-hud-carousel::-webkit-scrollbar-thumb {
+      background: var(--accent-core);
+      border-radius: 4px;
+    }
+    .media-card-item {
+      flex: 0 0 105px;
+      width: 105px;
+      scroll-snap-align: start;
       border: 1px solid var(--border-subtle);
       border-radius: 6px;
-      margin-bottom: 10px;
-    }
-
-    .media-card-item {
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
       padding: 6px;
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.02);
-      transition: all 0.2s;
+      background: rgba(255, 255, 255, 0.03);
+      transition: all 0.2s ease;
       text-align: center;
+      position: relative;
     }
     .media-card-item:hover {
       border-color: var(--accent-core);
@@ -773,19 +798,35 @@
     }
     .media-card-item.selected {
       border-color: var(--accent-core);
-      background: rgba(0, 240, 255, 0.15);
+      background: rgba(0, 240, 255, 0.16);
       box-shadow: 0 0 14px var(--accent-glow);
     }
-
+    .media-card-item.selected::after {
+      content: '✓ LOCKED';
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent-core);
+      color: #04070d;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+      white-space: nowrap;
+    }
     .media-thumb {
       width: 100%;
-      aspect-ratio: 9/12;
+      height: 125px;
       object-fit: cover;
-      border-radius: 3px;
-      background: #000;
+      border-radius: 4px;
+      background: #111;
+      display: block;
       margin-bottom: 6px;
     }
-
     .media-caption-hud {
       font-family: 'JetBrains Mono', monospace;
       font-size: 9px;
@@ -793,6 +834,7 @@
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+      line-height: 1.2;
     }
 
     /* Keyword quick presets */
@@ -1044,12 +1086,6 @@
         padding: 12px;
       }
 
-      .media-hud-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        max-height: 150px;
-      }
-
       .preset-chips-row {
         gap: 6px;
       }
@@ -1100,9 +1136,6 @@
       }
       .card-value {
         font-size: 22px;
-      }
-      .media-hud-grid {
-        grid-template-columns: repeat(2, 1fr);
       }
     }
   </style>
@@ -1249,17 +1282,34 @@
 
         <!-- Step 2: Target Reel -->
         <div class="form-step-section">
-          <div class="step-heading">
-            <span class="step-num">2</span> TARGET REEL (CLICK TO LOCK ON)
+          <div class="step-heading" style="justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div><span class="step-num">2</span> TARGET REEL (TAP TO LOCK ON)</div>
+            <button type="button" class="chip-btn" id="allReelsBtn" onclick="selectGlobalReels()" style="font-size: 10px; color: var(--accent-core); border-color: var(--accent-core);">★ ALL REELS (GLOBAL)</button>
           </div>
-          <div class="media-hud-grid" id="mediaPickerGrid">
-            <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-dim);">Connecting to Meta Media Inventory...</div>
+
+          <!-- Locked Banner (When a reel is picked) -->
+          <div id="lockedReelBanner" style="display: none; align-items: center; gap: 12px; background: rgba(0, 240, 255, 0.12); border: 1px solid var(--accent-core); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
+            <img id="lockedThumb" src="" style="width: 38px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--accent-core);">
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent-core); font-weight:700;">✓ LOCKED ONTO TARGET REEL</div>
+              <div id="lockedCaption" style="font-size:11px; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;"></div>
+              <div id="lockedIdText" style="font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--text-dim);"></div>
+            </div>
+            <button type="button" class="chip-btn" style="color:#ef4444; border-color:rgba(239,68,68,0.4);" onclick="clearTargetReel()">✕ UNLOCK</button>
           </div>
-          <div style="display: flex; gap: 8px; margin-top: 8px;">
-            <input type="text" id="campMediaId" placeholder="Locked Media ID (or leave blank for ALL Reels)">
-            <button type="button" class="chip-btn" style="white-space:nowrap;" onclick="document.getElementById('campMediaId').value=''; document.querySelectorAll('.media-card-item').forEach(i=>i.classList.remove('selected'));">Clear Target</button>
+
+          <!-- Horizontal Swipe Carousel -->
+          <div class="media-carousel-container">
+            <div class="media-carousel-swipe-hint">
+              <span>Swipe horizontally to choose video ↔</span>
+              <span id="mediaInventoryCount" style="color:var(--text-dim);"></span>
+            </div>
+            <div class="media-hud-carousel" id="mediaPickerGrid">
+              <div style="padding: 24px; text-align: center; color: var(--text-dim); width: 100%;">Connecting to Meta Media Inventory...</div>
+            </div>
           </div>
-          <div class="field-hint">Click any Reel above to auto-fill its ID, or leave blank to listen to all posts.</div>
+
+          <input type="hidden" id="campMediaId">
         </div>
 
         <!-- Step 3: Trigger Keywords -->
@@ -1592,21 +1642,24 @@
     async function loadRecentMedia() {
       try {
         const grid = document.getElementById('mediaPickerGrid');
+        const countSpan = document.getElementById('mediaInventoryCount');
         const res = await fetch('/api/media');
         recentMediaCache = await res.json();
 
         if (!Array.isArray(recentMediaCache) || recentMediaCache.length === 0) {
-          grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-dim);">No published media found. Input Media ID manually.</div>`;
+          grid.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-dim); width: 100%;">No published Reels retrieved. Click "ALL REELS" above for global targeting.</div>`;
           return;
         }
+
+        if (countSpan) countSpan.textContent = `(${recentMediaCache.length} Videos Available)`;
 
         grid.innerHTML = recentMediaCache.map(m => {
           const cleanCaption = (m.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
           const thumb = m.thumbnail_url || m.media_url || '';
 
           return `
-            <div class="media-card-item" onclick="selectMediaItem('${m.id}', this)">
-              ${thumb ? `<img src="${thumb}" class="media-thumb" alt="Reel">` : `<div class="media-thumb"></div>`}
+            <div class="media-card-item ${selectedMediaId === m.id ? 'selected' : ''}" onclick="selectMediaItem('${m.id}', this)">
+              ${thumb ? `<img src="${thumb}" class="media-thumb" alt="Reel" loading="lazy">` : `<div class="media-thumb"></div>`}
               <div class="media-caption-hud">${escapeHtml(cleanCaption)}</div>
             </div>
           `;
@@ -1620,9 +1673,36 @@
     function selectMediaItem(mediaId, el) {
       playSfx('click');
       document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
-      el.classList.add('selected');
+      if (el) el.classList.add('selected');
       document.getElementById('campMediaId').value = mediaId;
       selectedMediaId = mediaId;
+
+      const media = recentMediaCache.find(m => m.id === mediaId);
+      const banner = document.getElementById('lockedReelBanner');
+      const thumb = document.getElementById('lockedThumb');
+      const caption = document.getElementById('lockedCaption');
+      const idText = document.getElementById('lockedIdText');
+
+      if (media && banner) {
+        banner.style.display = 'flex';
+        thumb.src = media.thumbnail_url || media.media_url || '';
+        caption.textContent = (media.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
+        idText.textContent = `Node ID: ${media.id}`;
+      }
+    }
+
+    function clearTargetReel() {
+      playSfx('click');
+      selectedMediaId = null;
+      document.getElementById('campMediaId').value = '';
+      document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
+      const banner = document.getElementById('lockedReelBanner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    function selectGlobalReels() {
+      clearTargetReel();
+      alert('Global Target Enabled: This protocol will trigger across all Reels & posts on your account.');
     }
 
     function addKeywordPreset(kw) {
@@ -1643,7 +1723,7 @@
     function openNewCampaignModal() {
       playSfx('click');
       document.getElementById('campaignForm').reset();
-      selectedMediaId = null;
+      clearTargetReel();
       document.getElementById('dmPreviewBubble').textContent = 'Type above to see live preview...';
       document.getElementById('campaignModal').style.display = 'flex';
       loadRecentMedia();
