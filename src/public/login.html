@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NATC INDUSTRIES // SECURITY CLEARANCE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@600;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #04070d;
+      --bg-surface: rgba(8, 14, 26, 0.88);
+      --border-subtle: rgba(0, 229, 255, 0.2);
+      --border-active: rgba(0, 229, 255, 0.6);
+      --accent-core: #00f0ff;
+      --accent-glow: rgba(0, 240, 255, 0.35);
+      --accent-secondary: #f59e0b;
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #475569;
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-bright);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #holoCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.05;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hud-frame {
+      position: relative;
+    }
+    .hud-frame::before, .hud-frame::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      pointer-events: none;
+    }
+    .hud-frame::before {
+      top: -1px; left: -1px;
+      border-top: 2px solid var(--accent-core);
+      border-left: 2px solid var(--accent-core);
+    }
+    .hud-frame::after {
+      bottom: -1px; right: -1px;
+      border-bottom: 2px solid var(--accent-core);
+      border-right: 2px solid var(--accent-core);
+    }
+
+    .login-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 36px 32px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 30px var(--accent-glow);
+      text-align: center;
+    }
+
+    /* Arc Reactor */
+    .arc-reactor {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reactor-ring-outer {
+      position: absolute;
+      inset: 0;
+      border: 2px dashed var(--accent-core);
+      border-radius: 50%;
+      animation: reactorSpin 16s linear infinite;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .reactor-ring-inner {
+      position: absolute;
+      inset: 10px;
+      border: 1px solid var(--accent-core);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: reactorSpinRev 8s linear infinite;
+    }
+    .reactor-core {
+      width: 18px;
+      height: 18px;
+      background: var(--accent-core);
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--accent-core), 0 0 35px var(--accent-core);
+      animation: reactorPulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes reactorSpin { 100% { transform: rotate(360deg); } }
+    @keyframes reactorSpinRev { 100% { transform: rotate(-360deg); } }
+    @keyframes reactorPulse {
+      0% { transform: scale(0.85); opacity: 0.7; }
+      100% { transform: scale(1.15); opacity: 1; }
+    }
+
+    .brand-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--text-bright);
+      margin-bottom: 4px;
+    }
+
+    .brand-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent-core);
+      margin-bottom: 28px;
+    }
+
+    .field-group {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      padding: 12px 14px;
+      color: var(--text-bright);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    input:focus {
+      border-color: var(--accent-core);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--accent-core);
+      color: #04070d;
+      border: none;
+      border-radius: 5px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 0 24px var(--accent-glow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 0 35px var(--accent-glow);
+      transform: translateY(-1px);
+      filter: brightness(1.15);
+    }
+
+    .status-feedback {
+      margin-top: 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      min-height: 20px;
+      text-transform: uppercase;
+    }
+
+    .status-error {
+      color: var(--danger);
+      text-shadow: 0 0 10px var(--danger-glow);
+      animation: shake 0.35s ease;
+    }
+
+    .status-success {
+      color: #10b981;
+      text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="holoCanvas"></canvas>
+  <div class="scanlines"></div>
+
+  <div class="login-container">
+    <div class="login-card hud-frame">
+      <div class="arc-reactor">
+        <div class="reactor-ring-outer"></div>
+        <div class="reactor-ring-inner"></div>
+        <div class="reactor-core"></div>
+      </div>
+
+      <div class="brand-title">NATC INDUSTRIES</div>
+      <div class="brand-sub">SECURITY CLEARANCE // PROTOCOL SHELLY</div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="field-group">
+          <label>Agent Identifier</label>
+          <input type="text" id="username" placeholder="Username" required autofocus autocomplete="username">
+        </div>
+
+        <div class="field-group">
+          <label>Access Passphrase</label>
+          <input type="password" id="password" placeholder="Passphrase" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">AUTHENTICATE PROTOCOL</button>
+
+        <div class="status-feedback" id="feedback"></div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function playTone(freq, type, duration) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.start(now);
+        osc.stop(now + duration);
+      } catch (e) {}
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      playTone(800, 'sine', 0.05);
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const feedback = document.getElementById('feedback');
+      const submitBtn = document.getElementById('submitBtn');
+
+      feedback.className = 'status-feedback';
+      feedback.textContent = 'VERIFYING CREDENTIALS...';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          playTone(880, 'triangle', 0.2);
+          feedback.className = 'status-feedback status-success';
+          feedback.textContent = 'ACCESS GRANTED // INITIALIZING HUD...';
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 600);
+        } else {
+          playTone(200, 'sawtooth', 0.25);
+          feedback.className = 'status-feedback status-error';
+          feedback.textContent = 'ACCESS DENIED // INVALID CLEARANCE';
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        feedback.className = 'status-feedback status-error';
+        feedback.textContent = 'CONNECTION ERROR';
+        submitBtn.disabled = false;
+      }
+    }
+
+    // Particle canvas background
+    const canvas = document.getElementById('holoCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, particles = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      particles = [];
+      const count = Math.floor((width * height) / 20000);
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 1.5 + 0.5
+        });
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 100) {
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.08)';
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    animate();
+  </script>
+</body>
+</html>

@@ -34,5 +34,10 @@ module.exports = {
   MESSAGE_DELAY_MS: parseInt(process.env.MESSAGE_DELAY_MS || '1500', 10),
 
   // Dry run mode (logs actions without actually calling Meta API - great for testing!)
-  DRY_RUN: process.env.DRY_RUN === 'true' || !process.env.PAGE_ACCESS_TOKEN
+  DRY_RUN: process.env.DRY_RUN === 'true' || !process.env.PAGE_ACCESS_TOKEN,
+
+  // Admin Dashboard Security Credentials
+  ADMIN_USERNAME: process.env.ADMIN_USERNAME || 'natc',
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'RED200006X',
+  AUTH_SECRET: process.env.AUTH_SECRET || 'natc_industries_shelly_auth_secret_2026'
 };

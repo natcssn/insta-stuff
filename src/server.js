@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 const config = require('./config');
 const db = require('./db');
 const bot = require('./bot');
@@ -7,11 +9,98 @@ const instagramApi = require('./instagramApi');
 
 const app = express();
 
-// Parse JSON request bodies
+// Parse JSON request bodies & cookies
 app.use(express.json());
+app.use(cookieParser());
 
-// Serve static frontend UI from src/public
-app.use(express.static(path.join(__dirname, 'public')));
+// ---------------- CRYPTOGRAPHIC AUTHENTICATION ----------------
+function generateAuthToken(username) {
+  const expires = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
+  const data = `${username}:${expires}`;
+  const hmac = crypto.createHmac('sha256', config.AUTH_SECRET).update(data).digest('hex');
+  return Buffer.from(`${data}:${hmac}`).toString('base64');
+}
+
+function verifyAuthToken(token) {
+  if (!token) return false;
+  try {
+    const decoded = Buffer.from(token, 'base64').toString('utf8');
+    const [user, expiresStr, hmac] = decoded.split(':');
+    const expires = parseInt(expiresStr, 10);
+    if (isNaN(expires) || Date.now() > expires) return false;
+    if (user !== config.ADMIN_USERNAME) return false;
+    const expected = crypto.createHmac('sha256', config.AUTH_SECRET).update(`${user}:${expiresStr}`).digest('hex');
+    return crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expected));
+  } catch (err) {
+    return false;
+  }
+}
+
+function isRequestAuthenticated(req) {
+  const token = req.cookies?.auth_token || req.headers?.authorization?.replace('Bearer ', '');
+  return verifyAuthToken(token);
+}
+
+// ---------------- AUTH REST ENDPOINTS ----------------
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body || {};
+  if (username === config.ADMIN_USERNAME && password === config.ADMIN_PASSWORD) {
+    const token = generateAuthToken(username);
+    res.cookie('auth_token', token, {
+      httpOnly: true,
+      secure: false, // works seamlessly on both http and https
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000
+    });
+    return res.json({ success: true, token });
+  }
+  return res.status(401).json({ success: false, error: 'Access Denied: Invalid Security Clearance' });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  res.clearCookie('auth_token');
+  res.json({ success: true });
+});
+
+app.get('/api/auth/check', (req, res) => {
+  res.json({ authenticated: isRequestAuthenticated(req) });
+});
+
+// Protect all internal API routes (except /api/auth/*)
+app.use('/api', (req, res, next) => {
+  if (req.path.startsWith('/auth/')) return next();
+  if (!isRequestAuthenticated(req)) {
+    return res.status(401).json({ error: 'Security clearance required' });
+  }
+  next();
+});
+
+// ---------------- PROTECTED DASHBOARD PAGES ----------------
+app.get('/', (req, res) => {
+  if (isRequestAuthenticated(req)) {
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+  }
+});
+
+app.get('/login', (req, res) => {
+  if (isRequestAuthenticated(req)) {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+// Block unauthenticated direct access to html files
+app.get(['/dashboard', '/dashboard.html', '/index.html'], (req, res) => {
+  if (!isRequestAuthenticated(req)) {
+    return res.redirect('/login');
+  }
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+// Serve static frontend assets (without auto-serving index.html)
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // ---------------- REST API FOR DASHBOARD UI ----------------
 
