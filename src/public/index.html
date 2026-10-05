@@ -9,10 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ==========================================================================
-       NATC INDUSTRIES // PROTOCOL SHELLY & ULTRON DESIGN SYSTEM
+       NATC INDUSTRIES // PROTOCOL SHELLY DESIGN SYSTEM
        ========================================================================== */
     :root {
-      /* SHELLY PROTOCOL (DEFAULT - CLEAN STARK CYAN & TITANIUM) */
+      /* SHELLY PROTOCOL (CLEAN STARK CYAN & TITANIUM) */
       --bg-base: #04070d;
       --bg-surface: rgba(8, 14, 26, 0.85);
       --bg-surface-elevated: rgba(14, 22, 38, 0.92);
@@ -31,28 +31,6 @@
       
       --hud-corner: #00f0ff;
       --reactor-color: #00f0ff;
-    }
-
-    [data-protocol="ultron"] {
-      /* ULTRON PROTOCOL (BRIGHT ELECTRIC GOLDEN YELLOW & VIBRANIUM OBSIDIAN) */
-      --bg-base: #070603;
-      --bg-surface: rgba(24, 20, 8, 0.88);
-      --bg-surface-elevated: rgba(36, 30, 12, 0.94);
-      --border-subtle: rgba(255, 215, 0, 0.25);
-      --border-active: rgba(255, 215, 0, 0.7);
-      
-      --accent-core: #ffd700;
-      --accent-glow: rgba(255, 215, 0, 0.38);
-      --accent-secondary: #ffaa00;
-      --accent-secondary-glow: rgba(255, 170, 0, 0.28);
-      --accent-green: #facc15;
-      
-      --text-bright: #fffef5;
-      --text-muted: #fef08a;
-      --text-dim: #854d0e;
-      
-      --hud-corner: #ffd700;
-      --reactor-color: #ffd700;
     }
 
     * {
@@ -226,28 +204,6 @@
       display: flex;
       align-items: center;
       gap: 14px;
-    }
-
-    .protocol-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid var(--border-subtle);
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--accent-core);
-      transition: all 0.25s ease;
-    }
-    .protocol-toggle:hover {
-      border-color: var(--accent-core);
-      box-shadow: 0 0 16px var(--accent-glow);
     }
 
     .audio-toggle {
@@ -989,16 +945,15 @@
 
       .hud-controls {
         display: flex;
-        flex-wrap: wrap;
         gap: 8px;
         width: 100%;
       }
 
-      .protocol-toggle, .audio-toggle, .hud-controls .stark-btn {
-        flex: 1 1 calc(33.333% - 6px);
-        min-height: 40px;
-        padding: 6px 8px;
-        font-size: 9.5px;
+      .audio-toggle, .hud-controls .stark-btn {
+        flex: 1;
+        min-height: 42px;
+        padding: 8px 12px;
+        font-size: 11px;
         justify-content: center;
         text-align: center;
       }
@@ -1153,9 +1108,9 @@
       .brand-title {
         font-size: 14px;
       }
-      .protocol-toggle, .audio-toggle, .hud-controls .stark-btn {
-        font-size: 8.5px;
-        padding: 5px 6px;
+      .audio-toggle, .hud-controls .stark-btn {
+        font-size: 9.5px;
+        padding: 6px 8px;
       }
       .card-value {
         font-size: 22px;
@@ -1187,14 +1142,10 @@
       </div>
 
       <div class="hud-controls">
-        <button class="protocol-toggle" id="protocolBtn" onclick="toggleProtocol()">
-          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent-core); box-shadow:0 0 8px var(--accent-core);"></span>
-          <span id="protocolLabel">PROTOCOL: SHELLY</span>
-        </button>
         <button class="audio-toggle active" id="audioBtn" onclick="toggleAudioFeedback()">
           HUD SFX: ON
         </button>
-        <button class="stark-btn stark-btn-outline" style="padding: 6px 12px; font-size: 10px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);" onclick="handleLogout()">
+        <button class="stark-btn stark-btn-outline" style="padding: 6px 14px; font-size: 10px; color: #ef4444; border-color: rgba(239, 68, 68, 0.4);" onclick="handleLogout()">
           LOCK CONSOLE
         </button>
       </div>
@@ -1428,14 +1379,6 @@
           gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
           osc.start(now);
           osc.stop(now + 0.15);
-        } else if (type === 'protocol') {
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(220, now);
-          osc.frequency.exponentialRampToValueAtTime(550, now + 0.2);
-          gain.gain.setValueAtTime(0.08, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-          osc.start(now);
-          osc.stop(now + 0.25);
         }
       } catch (e) {}
     }
@@ -1451,20 +1394,6 @@
         btn.classList.remove('active');
         btn.textContent = 'HUD SFX: MUTED';
       }
-    }
-
-    /* ==========================================================================
-       PROTOCOL TOGGLE (SHELLY <-> ULTRON)
-       ========================================================================== */
-    function toggleProtocol() {
-      const html = document.documentElement;
-      const current = html.getAttribute('data-protocol');
-      const next = current === 'shelly' ? 'ultron' : 'shelly';
-      html.setAttribute('data-protocol', next);
-
-      const label = document.getElementById('protocolLabel');
-      label.textContent = next === 'shelly' ? 'PROTOCOL: SHELLY' : 'PROTOCOL: ULTRON';
-      playSfx('protocol');
     }
 
     /* ==========================================================================
@@ -1514,9 +1443,8 @@
 
     function drawParticles() {
       ctx.clearRect(0, 0, width, height);
-      const isUltron = document.documentElement.getAttribute('data-protocol') === 'ultron';
-      const nodeColor = isUltron ? 'rgba(255, 215, 0, 0.55)' : 'rgba(0, 240, 255, 0.4)';
-      const lineColor = isUltron ? 'rgba(255, 215, 0, 0.12)' : 'rgba(0, 240, 255, 0.08)';
+      const nodeColor = 'rgba(0, 240, 255, 0.4)';
+      const lineColor = 'rgba(0, 240, 255, 0.08)';
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -1548,7 +1476,7 @@
 
         const mouseDist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
         if (mouseDist < 130) {
-          ctx.strokeStyle = isUltron ? 'rgba(255, 215, 0, 0.35)' : 'rgba(0, 240, 255, 0.25)';
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
