@@ -1,7 +1,13 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const dbPath = path.join(__dirname, '..', 'bot_data.sqlite');
+const fs = require('fs');
+
+const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'bot_data.sqlite');
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 const db = new Database(dbPath);
 
 // Initialize tables
