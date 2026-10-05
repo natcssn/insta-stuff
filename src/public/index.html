@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en" data-protocol="shelly">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NATC INDUSTRIES // PROTOCOL SHELLY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       NATC INDUSTRIES // PROTOCOL SHELLY & ULTRON DESIGN SYSTEM
+       ========================================================================== */
+    :root {
+      /* SHELLY PROTOCOL (DEFAULT - CLEAN STARK CYAN & TITANIUM) */
+      --bg-base: #04070d;
+      --bg-surface: rgba(8, 14, 26, 0.85);
+      --bg-surface-elevated: rgba(14, 22, 38, 0.92);
+      --border-subtle: rgba(0, 229, 255, 0.16);
+      --border-active: rgba(0, 229, 255, 0.55);
+      
+      --accent-core: #00f0ff;
+      --accent-glow: rgba(0, 240, 255, 0.28);
+      --accent-secondary: #f59e0b;
+      --accent-secondary-glow: rgba(245, 158, 11, 0.25);
+      --accent-green: #10b981;
+      
+      --text-bright: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #475569;
+      
+      --hud-corner: #00f0ff;
+      --reactor-color: #00f0ff;
+    }
+
+    [data-protocol="ultron"] {
+      /* ULTRON PROTOCOL (BRIGHT ELECTRIC GOLDEN YELLOW & VIBRANIUM OBSIDIAN) */
+      --bg-base: #070603;
+      --bg-surface: rgba(24, 20, 8, 0.88);
+      --bg-surface-elevated: rgba(36, 30, 12, 0.94);
+      --border-subtle: rgba(255, 215, 0, 0.25);
+      --border-active: rgba(255, 215, 0, 0.7);
+      
+      --accent-core: #ffd700;
+      --accent-glow: rgba(255, 215, 0, 0.38);
+      --accent-secondary: #ffaa00;
+      --accent-secondary-glow: rgba(255, 170, 0, 0.28);
+      --accent-green: #facc15;
+      
+      --text-bright: #fffef5;
+      --text-muted: #fef08a;
+      --text-dim: #854d0e;
+      
+      --hud-corner: #ffd700;
+      --reactor-color: #ffd700;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-bright);
+      font-family: 'Inter', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.35s ease;
+    }
+
+    /* Interactive Holographic Canvas Backdrop */
+    #holoCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Subtle CRT Scanlines */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.04;
+    }
+
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 24px 32px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* HUD Corner Brackets */
+    .hud-frame {
+      position: relative;
+    }
+    .hud-frame::before, .hud-frame::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      pointer-events: none;
+      transition: border-color 0.3s ease;
+    }
+    .hud-frame::before {
+      top: -1px; left: -1px;
+      border-top: 2px solid var(--hud-corner);
+      border-left: 2px solid var(--hud-corner);
+    }
+    .hud-frame::after {
+      bottom: -1px; right: -1px;
+      border-bottom: 2px solid var(--hud-corner);
+      border-right: 2px solid var(--hud-corner);
+    }
+
+    /* ==========================================================================
+       TOP EXECUTIVE HUD HEADER
+       ========================================================================== */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px var(--accent-glow);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    /* ARC REACTOR ICON */
+    .arc-reactor {
+      width: 48px;
+      height: 48px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .reactor-ring-outer {
+      position: absolute;
+      inset: 0;
+      border: 2px dashed var(--reactor-color);
+      border-radius: 50%;
+      animation: reactorSpin 16s linear infinite;
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+    .reactor-ring-inner {
+      position: absolute;
+      inset: 8px;
+      border: 1px solid var(--reactor-color);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: reactorSpinRev 8s linear infinite;
+    }
+    .reactor-core {
+      width: 14px;
+      height: 14px;
+      background: var(--reactor-color);
+      border-radius: 50%;
+      box-shadow: 0 0 20px var(--reactor-color), 0 0 35px var(--reactor-color);
+      animation: reactorPulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes reactorSpin { 100% { transform: rotate(360deg); } }
+    @keyframes reactorSpinRev { 100% { transform: rotate(-360deg); } }
+    @keyframes reactorPulse {
+      0% { transform: scale(0.85); opacity: 0.7; }
+      100% { transform: scale(1.15); opacity: 1; }
+    }
+
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 8px;
+      border: 1px solid var(--accent-core);
+      color: var(--accent-core);
+      border-radius: 4px;
+      letter-spacing: 1px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .brand-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .protocol-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent-core);
+      transition: all 0.25s ease;
+    }
+    .protocol-toggle:hover {
+      border-color: var(--accent-core);
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .audio-toggle {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .audio-toggle.active {
+      color: var(--accent-core);
+      border-color: var(--accent-core);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    /* ==========================================================================
+       ACCURATE STABLE SPOTLIGHT METRICS (ZERO GLITCH / RANDOM VALUES)
+       ========================================================================== */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 950px) {
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .spotlight-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 22px 24px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+      transition: border-color 0.25s ease, transform 0.25s ease;
+      cursor: default;
+    }
+
+    .spotlight-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+    }
+
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        350px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+        var(--accent-glow),
+        transparent 65%
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .spotlight-card:hover::before { opacity: 1; }
+
+    .card-top-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .card-telemetry-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 1px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-subtle);
+      color: var(--accent-core);
+    }
+
+    .card-value {
+      font-family: 'Orbitron', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-bright);
+      line-height: 1;
+    }
+
+    .val-core { color: var(--accent-core); text-shadow: 0 0 16px var(--accent-glow); }
+    .val-sec { color: var(--accent-secondary); text-shadow: 0 0 16px var(--accent-secondary-glow); }
+
+    /* ==========================================================================
+       TACTICAL PANELS & SECTIONS
+       ========================================================================== */
+    .hud-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      backdrop-filter: blur(16px);
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .panel-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .panel-reticle {
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--accent-core);
+      transform: rotate(45deg);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    /* ACTION BUTTONS */
+    .stark-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .stark-btn-primary {
+      background: var(--accent-core);
+      color: #04070d;
+      border-color: var(--accent-core);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+    .stark-btn-primary:hover {
+      box-shadow: 0 0 30px var(--accent-glow);
+      transform: translateY(-1px);
+      filter: brightness(1.1);
+    }
+
+    .stark-btn-outline {
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text-bright);
+      border-color: var(--border-subtle);
+    }
+    .stark-btn-outline:hover {
+      border-color: var(--accent-core);
+      color: var(--accent-core);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    /* ==========================================================================
+       CAMPAIGN PROTOCOL CARDS
+       ========================================================================== */
+    .campaigns-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 18px;
+    }
+
+    .campaign-hud-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 22px;
+      position: relative;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .campaign-hud-card:hover {
+      border-color: var(--border-active);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 12px var(--accent-glow);
+    }
+
+    .campaign-hud-card.active-state {
+      border-left: 3px solid var(--accent-core);
+    }
+    .campaign-hud-card.paused-state {
+      border-left: 3px solid var(--text-dim);
+      opacity: 0.7;
+    }
+
+    .camp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .camp-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-bright);
+    }
+
+    .camp-target {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--accent-core);
+      margin-top: 4px;
+    }
+
+    .keyword-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .hud-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      color: var(--accent-secondary);
+    }
+
+    .payload-box {
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px dashed var(--border-subtle);
+      border-radius: 4px;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 90px;
+      overflow-y: auto;
+    }
+
+    .camp-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 42px;
+      height: 22px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #1e293b;
+      transition: .3s;
+      border-radius: 22px;
+      border: 1px solid var(--border-subtle);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text-muted);
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: rgba(0, 240, 255, 0.2);
+      border-color: var(--accent-core);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: var(--accent-core);
+      box-shadow: 0 0 10px var(--accent-core);
+    }
+
+    .btn-terminate {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #ef4444;
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .btn-terminate:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: #ef4444;
+    }
+
+    /* ==========================================================================
+       TELEMETRY STREAM LOG (PRISTINE, NO SELF-COMMENTS)
+       ========================================================================== */
+    .telemetry-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    .telemetry-table th {
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .telemetry-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+    }
+
+    .telemetry-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text-bright);
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .status-SUCCESS {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+    }
+    .status-SKIPPED_NO_KEYWORD, .status-SKIPPED_NO_CAMPAIGN {
+      background: rgba(100, 116, 139, 0.1);
+      color: var(--text-dim);
+      border: 1px solid rgba(100, 116, 139, 0.2);
+    }
+    .status-FAILED {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    /* ==========================================================================
+       CLEAN, MODERN PROTOCOL INITIALIZER MODAL
+       ========================================================================== */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 5, 8, 0.88);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-frame {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--accent-core);
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.95), 0 0 30px var(--accent-glow);
+      border-radius: 10px;
+      width: 100%;
+      max-width: 740px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+    }
+
+    .modal-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text-bright);
+      text-transform: uppercase;
+    }
+
+    .modal-close-x {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .modal-close-x:hover { color: var(--accent-core); }
+
+    .modal-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .form-step-section {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 16px 18px;
+      margin-bottom: 18px;
+    }
+
+    .step-heading {
+      font-family: 'Orbitron', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--accent-core);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .step-num {
+      width: 18px;
+      height: 18px;
+      background: var(--accent-core);
+      color: #04070d;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* Media Selector Grid */
+    .media-hud-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .media-card-item {
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 6px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.02);
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .media-card-item:hover {
+      border-color: var(--accent-core);
+      transform: translateY(-2px);
+    }
+    .media-card-item.selected {
+      border-color: var(--accent-core);
+      background: rgba(0, 240, 255, 0.15);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    .media-thumb {
+      width: 100%;
+      aspect-ratio: 9/12;
+      object-fit: cover;
+      border-radius: 3px;
+      background: #000;
+      margin-bottom: 6px;
+    }
+
+    .media-caption-hud {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--text-muted);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* Keyword quick presets */
+    .preset-chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      align-items: center;
+    }
+    .preset-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+    }
+    .chip-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 3px;
+      padding: 3px 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--accent-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .chip-btn:hover {
+      border-color: var(--accent-secondary);
+      box-shadow: 0 0 8px var(--accent-secondary-glow);
+    }
+
+    /* Live Instagram DM Bubble Preview */
+    .dm-preview-card {
+      margin-top: 10px;
+      background: #000;
+      border: 1px solid #262626;
+      border-radius: 12px;
+      padding: 12px 14px;
+      max-width: 320px;
+    }
+    .dm-preview-title {
+      font-size: 9px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .dm-bubble {
+      background: #262626;
+      color: #fff;
+      font-size: 12px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: var(--text-bright);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    input[type="text"]:focus, textarea:focus {
+      border-color: var(--accent-core);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .field-hint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      border: 1px dashed var(--border-subtle);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+    .empty-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas Hologram Particles Backdrop -->
+  <canvas id="holoCanvas"></canvas>
+  <div class="scanlines"></div>
+
+  <div class="container">
+    <!-- TOP EXECUTIVE HUD HEADER -->
+    <header class="hud-frame">
+      <div class="brand-group">
+        <div class="arc-reactor">
+          <div class="reactor-ring-outer"></div>
+          <div class="reactor-ring-inner"></div>
+          <div class="reactor-core"></div>
+        </div>
+        <div class="brand-meta">
+          <div class="brand-title">
+            NATC INDUSTRIES
+            <span class="brand-badge">PROTOCOL SHELLY</span>
+          </div>
+          <div class="brand-sub">INSTAGRAM GRAPH PROTOCOL // TARGET ACQUISITION & DIRECT DISPATCH</div>
+        </div>
+      </div>
+
+      <div class="hud-controls">
+        <button class="protocol-toggle" id="protocolBtn" onclick="toggleProtocol()">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--accent-core); box-shadow:0 0 8px var(--accent-core);"></span>
+          <span id="protocolLabel">PROTOCOL: SHELLY</span>
+        </button>
+        <button class="audio-toggle active" id="audioBtn" onclick="toggleAudioFeedback()">
+          HUD SFX: ON
+        </button>
+      </div>
+    </header>
+
+    <!-- ACCURATE STABLE SPOTLIGHT METRICS -->
+    <div class="metrics-grid">
+      <div class="spotlight-card hud-frame" onmousemove="handleSpotlight(event, this)">
+        <div class="card-top-line">
+          <span class="card-label">ACTIVE CAMPAIGNS</span>
+          <span class="card-telemetry-badge">LIVE</span>
+        </div>
+        <div class="card-value val-core" id="stat-active">0</div>
+      </div>
+
+      <div class="spotlight-card hud-frame" onmousemove="handleSpotlight(event, this)">
+        <div class="card-top-line">
+          <span class="card-label">TOTAL DMS SENT</span>
+          <span class="card-telemetry-badge">SENT</span>
+        </div>
+        <div class="card-value val-sec" id="stat-dms">0</div>
+      </div>
+
+      <div class="spotlight-card hud-frame" onmousemove="handleSpotlight(event, this)">
+        <div class="card-top-line">
+          <span class="card-label">FILTERED COMMENTS</span>
+          <span class="card-telemetry-badge">ISOLATED</span>
+        </div>
+        <div class="card-value" id="stat-skipped">0</div>
+      </div>
+
+      <div class="spotlight-card hud-frame" onmousemove="handleSpotlight(event, this)">
+        <div class="card-top-line">
+          <span class="card-label">TOTAL COMMENTS</span>
+          <span class="card-telemetry-badge">STREAM</span>
+        </div>
+        <div class="card-value" id="stat-total">0</div>
+      </div>
+    </div>
+
+    <!-- PROTOCOL DEPLOYMENT SUITE -->
+    <div class="hud-panel hud-frame">
+      <div class="panel-header">
+        <div class="panel-title">
+          <div class="panel-reticle"></div>
+          ACTIVE TARGET CAMPAIGNS
+        </div>
+        <button class="stark-btn stark-btn-primary" onclick="openNewCampaignModal()">
+          + INITIALIZE PROTOCOL
+        </button>
+      </div>
+
+      <div class="campaigns-container" id="campaigns-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- PRISTINE TELEMETRY STREAM LOG (SELF-COMMENTS FILTERED OUT) -->
+    <div class="hud-panel hud-frame">
+      <div class="panel-header">
+        <div class="panel-title">
+          <div class="panel-reticle"></div>
+          TELEMETRY FEED // CLASSIFIED LOGS
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent-core); letter-spacing: 1px;">
+          [ LIVE 200 OK BUFFER ACTIVE ]
+        </div>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table class="telemetry-table">
+          <thead>
+            <tr>
+              <th>TIME (UTC+5:30)</th>
+              <th>ORIGIN ACCOUNT</th>
+              <th>PAYLOAD CONTENT</th>
+              <th>TARGET PROTOCOL</th>
+              <th>EXECUTION STATE</th>
+            </tr>
+          </thead>
+          <tbody id="activity-tbody">
+            <!-- Dynamic Telemetry Rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLEAN, REDESIGNED PROTOCOL INITIALIZATION MODAL -->
+  <div class="modal-backdrop" id="campaignModal">
+    <div class="modal-frame hud-frame">
+      <div class="modal-title-row">
+        <div class="modal-title">INITIALIZE PROTOCOL</div>
+        <button class="modal-close-x" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-sub">CONFIGURE AUTOMATIC INSTAGRAM COMMENT-TO-DM FLOW</div>
+
+      <form id="campaignForm" onsubmit="handleSaveCampaign(event)">
+        <!-- Step 1: Codename -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">1</span> CAMPAIGN CODENAME
+          </div>
+          <input type="text" id="campTitle" placeholder="e.g. PEAK_REEL_AUTONOMY" required>
+          <div class="field-hint">Internal name for identifying this automation.</div>
+        </div>
+
+        <!-- Step 2: Target Reel -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">2</span> TARGET REEL (CLICK TO LOCK ON)
+          </div>
+          <div class="media-hud-grid" id="mediaPickerGrid">
+            <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-dim);">Connecting to Meta Media Inventory...</div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <input type="text" id="campMediaId" placeholder="Locked Media ID (or leave blank for ALL Reels)">
+            <button type="button" class="chip-btn" style="white-space:nowrap;" onclick="document.getElementById('campMediaId').value=''; document.querySelectorAll('.media-card-item').forEach(i=>i.classList.remove('selected'));">Clear Target</button>
+          </div>
+          <div class="field-hint">Click any Reel above to auto-fill its ID, or leave blank to listen to all posts.</div>
+        </div>
+
+        <!-- Step 3: Trigger Keywords -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">3</span> TRIGGER KEYWORDS (CASE-INSENSITIVE)
+          </div>
+          <input type="text" id="campKeywords" placeholder="e.g. peak, link, guide" required>
+          <div class="preset-chips-row">
+            <span class="preset-label">Quick Add:</span>
+            <button type="button" class="chip-btn" onclick="addKeywordPreset('peak')">+ peak</button>
+            <button type="button" class="chip-btn" onclick="addKeywordPreset('link')">+ link</button>
+            <button type="button" class="chip-btn" onclick="addKeywordPreset('guide')">+ guide</button>
+            <button type="button" class="chip-btn" onclick="addKeywordPreset('code')">+ code</button>
+            <button type="button" class="chip-btn" onclick="addKeywordPreset('*')">+ * (all comments)</button>
+          </div>
+          <div class="field-hint">Case is completely ignored. "Peak", "PEAK", and "peak" will all trigger.</div>
+        </div>
+
+        <!-- Step 4: Private DM Payload -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">4</span> PRIVATE DIRECT MESSAGE PAYLOAD
+          </div>
+          <textarea id="campDmText" rows="4" placeholder="Greetings! Here is the resource you asked for:&#10;&#10;https://yourlink.com" required oninput="updateDmPreview(this.value)"></textarea>
+
+          <!-- Live Preview -->
+          <div class="dm-preview-card">
+            <div class="dm-preview-title">Follower DM Inbox Preview</div>
+            <div class="dm-bubble" id="dmPreviewBubble">Type above to see live preview...</div>
+          </div>
+        </div>
+
+        <!-- Step 5: Public Comment Reply -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">5</span> PUBLIC COMMENT REPLY (OPTIONAL)
+          </div>
+          <input type="text" id="campPublicReply" placeholder="Sent to your DMs! Check your inbox ✨">
+          <div class="field-hint">Leave blank if you prefer silent DMs without a public comment.</div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <button type="button" class="stark-btn stark-btn-outline" onclick="closeModal()">CANCEL</button>
+          <button type="submit" class="stark-btn stark-btn-primary">DEPLOY PROTOCOL</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       SYNTHESIZED HUD AUDIO (WEB AUDIO API)
+       ========================================================================== */
+    let audioCtx = null;
+    let sfxEnabled = true;
+
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    function playSfx(type) {
+      if (!sfxEnabled) return;
+      try {
+        const ctx = getAudioCtx();
+        if (ctx.state === 'suspended') ctx.resume();
+
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        const now = ctx.currentTime;
+
+        if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1100, now);
+          osc.frequency.exponentialRampToValueAtTime(550, now + 0.04);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'deploy') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'protocol') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(550, now + 0.2);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        }
+      } catch (e) {}
+    }
+
+    function toggleAudioFeedback() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById('audioBtn');
+      if (sfxEnabled) {
+        btn.classList.add('active');
+        btn.textContent = 'HUD SFX: ON';
+        playSfx('click');
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = 'HUD SFX: MUTED';
+      }
+    }
+
+    /* ==========================================================================
+       PROTOCOL TOGGLE (SHELLY <-> ULTRON)
+       ========================================================================== */
+    function toggleProtocol() {
+      const html = document.documentElement;
+      const current = html.getAttribute('data-protocol');
+      const next = current === 'shelly' ? 'ultron' : 'shelly';
+      html.setAttribute('data-protocol', next);
+
+      const label = document.getElementById('protocolLabel');
+      label.textContent = next === 'shelly' ? 'PROTOCOL: SHELLY' : 'PROTOCOL: ULTRON';
+      playSfx('protocol');
+    }
+
+    /* ==========================================================================
+       SPOTLIGHT MOUSE TRACKER
+       ========================================================================== */
+    function handleSpotlight(e, card) {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    }
+
+    /* ==========================================================================
+       BACKGROUND PARTICLES
+       ========================================================================== */
+    const canvas = document.getElementById('holoCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    let mouse = { x: -1000, y: -1000 };
+
+    window.addEventListener('mousemove', e => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initParticles();
+    }
+
+    function initParticles() {
+      particles = [];
+      const count = Math.floor((width * height) / 19000);
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35,
+          size: Math.random() * 1.5 + 0.5
+        });
+      }
+    }
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, width, height);
+      const isUltron = document.documentElement.getAttribute('data-protocol') === 'ultron';
+      const nodeColor = isUltron ? 'rgba(255, 215, 0, 0.55)' : 'rgba(0, 240, 255, 0.4)';
+      const lineColor = isUltron ? 'rgba(255, 215, 0, 0.12)' : 'rgba(0, 240, 255, 0.08)';
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.fillStyle = nodeColor;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 110) {
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+
+        const mouseDist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+        if (mouseDist < 130) {
+          ctx.strokeStyle = isUltron ? 'rgba(255, 215, 0, 0.35)' : 'rgba(0, 240, 255, 0.25)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+          ctx.stroke();
+        }
+      }
+      requestAnimationFrame(drawParticles);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    drawParticles();
+
+    /* ==========================================================================
+       ACCURATE REAL METRICS & DATA FETCHING
+       ========================================================================== */
+    let recentMediaCache = [];
+    let selectedMediaId = null;
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        // Set exact, stable numbers without scrambling or random flickering
+        document.getElementById('stat-active').textContent = data.stats.activeCampaigns || 0;
+        document.getElementById('stat-dms').textContent = data.stats.successfulDms || 0;
+        document.getElementById('stat-skipped').textContent = data.stats.skipped || 0;
+        document.getElementById('stat-total').textContent = data.stats.total || 0;
+      } catch (err) {
+        console.error('Stats fetch error:', err);
+      }
+    }
+
+    async function loadCampaigns() {
+      try {
+        const res = await fetch('/api/campaigns');
+        const campaigns = await res.json();
+        const container = document.getElementById('campaigns-container');
+
+        if (campaigns.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state" style="grid-column: 1/-1;">
+              <div class="empty-title">NO ACTIVE CAMPAIGNS</div>
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:16px;">
+                Deploy a target automation to begin responding to qualified comments.
+              </div>
+              <button class="stark-btn stark-btn-primary" onclick="openNewCampaignModal()">+ INITIALIZE PROTOCOL</button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = campaigns.map(c => `
+          <div class="campaign-hud-card ${c.is_active ? 'active-state' : 'paused-state'}">
+            <div>
+              <div class="camp-header">
+                <div>
+                  <div class="camp-title">${escapeHtml(c.title)}</div>
+                  <div class="camp-target">TARGET REEL // ${escapeHtml(c.media_id || 'ALL_POSTS')}</div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" ${c.is_active ? 'checked' : ''} onchange="toggleCampaign(${c.id}, this.checked)">
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="keyword-chips">
+                ${c.trigger_keywords.split(',').map(k => `<span class="hud-chip">KEYWORD: ${escapeHtml(k.trim())}</span>`).join('')}
+              </div>
+
+              <div class="payload-box">${escapeHtml(c.dm_text)}</div>
+            </div>
+
+            <div class="camp-footer">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:${c.is_active ? 'var(--accent-core)' : 'var(--text-dim)'}; letter-spacing:1px; font-weight:600;">
+                STATUS: ${c.is_active ? 'ACTIVE & LISTENING' : 'STANDBY (PAUSED)'}
+              </span>
+              <button class="btn-terminate" onclick="deleteCampaign(${c.id})">TERMINATE</button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        console.error('Campaigns fetch error:', err);
+      }
+    }
+
+    async function loadActivity() {
+      try {
+        const res = await fetch('/api/comments');
+        const comments = await res.json();
+        const tbody = document.getElementById('activity-tbody');
+
+        if (comments.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-dim); padding: 32px;">Zero signals detected in buffer.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = comments.map(c => {
+          const time = new Date(c.processed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const statusClass = `status-${c.status || 'UNKNOWN'}`;
+
+          return `
+            <tr>
+              <td>${time}</td>
+              <td style="color:var(--accent-core); font-weight:600;">@${escapeHtml(c.username || c.user_id || 'UNKNOWN')}</td>
+              <td style="color:var(--text-bright);">"${escapeHtml(c.comment_text)}"</td>
+              <td>${escapeHtml(c.campaign_title || c.media_id || 'STANDBY')}</td>
+              <td><span class="badge-status ${statusClass}">${c.status}</span></td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Activity fetch error:', err);
+      }
+    }
+
+    async function loadRecentMedia() {
+      try {
+        const grid = document.getElementById('mediaPickerGrid');
+        const res = await fetch('/api/media');
+        recentMediaCache = await res.json();
+
+        if (!Array.isArray(recentMediaCache) || recentMediaCache.length === 0) {
+          grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-dim);">No published media found. Input Media ID manually.</div>`;
+          return;
+        }
+
+        grid.innerHTML = recentMediaCache.map(m => {
+          const cleanCaption = (m.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
+          const thumb = m.thumbnail_url || m.media_url || '';
+
+          return `
+            <div class="media-card-item" onclick="selectMediaItem('${m.id}', this)">
+              ${thumb ? `<img src="${thumb}" class="media-thumb" alt="Reel">` : `<div class="media-thumb"></div>`}
+              <div class="media-caption-hud">${escapeHtml(cleanCaption)}</div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.warn('Could not load media inventory:', err);
+      }
+    }
+
+    function selectMediaItem(mediaId, el) {
+      playSfx('click');
+      document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('campMediaId').value = mediaId;
+      selectedMediaId = mediaId;
+    }
+
+    function addKeywordPreset(kw) {
+      playSfx('click');
+      const input = document.getElementById('campKeywords');
+      const existing = input.value.split(',').map(s => s.trim()).filter(Boolean);
+      if (!existing.includes(kw)) {
+        existing.push(kw);
+        input.value = existing.join(', ');
+      }
+    }
+
+    function updateDmPreview(val) {
+      const bubble = document.getElementById('dmPreviewBubble');
+      bubble.textContent = val.trim() || 'Type above to see live preview...';
+    }
+
+    function openNewCampaignModal() {
+      playSfx('click');
+      document.getElementById('campaignForm').reset();
+      selectedMediaId = null;
+      document.getElementById('dmPreviewBubble').textContent = 'Type above to see live preview...';
+      document.getElementById('campaignModal').style.display = 'flex';
+      loadRecentMedia();
+    }
+
+    function closeModal() {
+      playSfx('click');
+      document.getElementById('campaignModal').style.display = 'none';
+    }
+
+    async function handleSaveCampaign(e) {
+      e.preventDefault();
+      playSfx('deploy');
+
+      const payload = {
+        title: document.getElementById('campTitle').value,
+        mediaId: document.getElementById('campMediaId').value.trim(),
+        triggerKeywords: document.getElementById('campKeywords').value,
+        dmText: document.getElementById('campDmText').value,
+        publicReply: document.getElementById('campPublicReply').value
+      };
+
+      try {
+        const res = await fetch('/api/campaigns', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          closeModal();
+          loadCampaigns();
+          loadStats();
+        } else {
+          alert('Failed to deploy protocol');
+        }
+      } catch (err) {
+        alert('Error deploying protocol: ' + err.message);
+      }
+    }
+
+    async function toggleCampaign(id, isActive) {
+      playSfx('click');
+      try {
+        await fetch(`/api/campaigns/${id}/toggle`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isActive })
+        });
+        loadCampaigns();
+        loadStats();
+      } catch (err) {
+        console.error('Toggle error:', err);
+      }
+    }
+
+    async function deleteCampaign(id) {
+      playSfx('click');
+      if (!confirm('Confirm termination of this protocol?')) return;
+      try {
+        await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+        loadCampaigns();
+        loadStats();
+      } catch (err) {
+        console.error('Delete error:', err);
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    // Initial boot sequence
+    loadStats();
+    loadCampaigns();
+    loadActivity();
+
+    // Auto telemetry polling
+    setInterval(() => {
+      loadStats();
+      loadActivity();
+    }, 5000);
+  </script>
+</body>
+</html>
