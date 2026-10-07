@@ -835,33 +835,218 @@
       box-shadow: 0 0 8px var(--accent-secondary-glow);
     }
 
-    /* Live Instagram DM Bubble Preview */
-    .dm-preview-card {
-      margin-top: 10px;
-      background: #000;
+    /* DM Type Selector Tabs */
+    .dm-type-toggle-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .dm-type-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .dm-type-btn:hover {
+      border-color: var(--accent-core);
+      color: var(--text-bright);
+    }
+    .dm-type-btn.active {
+      background: rgba(0, 240, 255, 0.12);
+      border-color: var(--accent-core);
+      color: var(--accent-core);
+      box-shadow: 0 0 14px var(--accent-glow);
+    }
+
+    /* Live Instagram Dual Preview System */
+    .dual-preview-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 768px) {
+      .dual-preview-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .preview-phone-card {
+      background: #000000;
       border: 1px solid #262626;
       border-radius: 12px;
       padding: 12px 14px;
-      max-width: 320px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
     }
-    .dm-preview-title {
-      font-size: 9px;
+    .preview-header-label {
       font-family: 'JetBrains Mono', monospace;
-      color: var(--text-dim);
-      text-transform: uppercase;
+      font-size: 10px;
+      font-weight: 700;
       letter-spacing: 1px;
-      margin-bottom: 6px;
+      text-transform: uppercase;
+      color: var(--accent-core);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+    .preview-header-label::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--accent-core);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent-core);
+    }
+
+    /* Instagram Comment UI Simulation */
+    .ig-comment-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ig-comment-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .ig-comment-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .ig-comment-avatar.creator {
+      background: linear-gradient(135deg, #00f0ff, #3b82f6);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    .ig-comment-body {
+      flex: 1;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.35;
+      color: #f5f5f5;
+    }
+    .ig-comment-username {
+      font-weight: 600;
+      color: #fff;
+      margin-right: 6px;
+      display: inline;
+    }
+    .ig-comment-reply-thread {
+      margin-left: 20px;
+      padding-left: 10px;
+      border-left: 1.5px solid #262626;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 6px;
+    }
+    .ig-comment-meta {
+      font-size: 10px;
+      color: #737373;
+      margin-top: 4px;
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Instagram DM Bubble UI Simulation */
     .dm-bubble {
       background: #262626;
       color: #fff;
       font-size: 12px;
       padding: 10px 14px;
-      border-radius: 16px;
+      border-radius: 18px;
       border-bottom-left-radius: 4px;
       line-height: 1.4;
       white-space: pre-wrap;
       word-break: break-word;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* Instagram Generic Template Card UI Simulation */
+    .ig-card-template {
+      background: #121212;
+      border: 1px solid #262626;
+      border-radius: 12px;
+      overflow: hidden;
+      width: 100%;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .ig-card-img-wrap {
+      width: 100%;
+      height: 95px;
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(245, 158, 11, 0.15));
+      overflow: hidden;
+      position: relative;
+    }
+    .ig-card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .ig-card-body {
+      padding: 8px 10px;
+    }
+    .ig-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 3px;
+      line-height: 1.25;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .ig-card-subtitle {
+      font-size: 10.5px;
+      color: #a8a8a8;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .ig-card-btn {
+      display: block;
+      width: 100%;
+      padding: 8px 10px;
+      border: none;
+      border-top: 1px solid #262626;
+      background: transparent;
+      color: #0095f6;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .ig-card-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
     }
 
     input[type="text"], textarea {
@@ -1354,17 +1539,57 @@
           <div class="field-hint">Case is completely ignored. "Peak", "PEAK", and "peak" will all trigger.</div>
         </div>
 
-        <!-- Step 4: Private DM Payload -->
+        <!-- Step 4: Private DM Dispatch Configuration -->
         <div class="form-step-section">
           <div class="step-heading">
             <span class="step-num">4</span> PRIVATE DIRECT MESSAGE PAYLOAD
           </div>
-          <textarea id="campDmText" rows="4" placeholder="Greetings! Here is the resource you asked for:&#10;&#10;https://yourlink.com" required oninput="updateDmPreview(this.value)"></textarea>
 
-          <!-- Live Preview -->
-          <div class="dm-preview-card">
-            <div class="dm-preview-title">Follower DM Inbox Preview</div>
-            <div class="dm-bubble" id="dmPreviewBubble">Type above to see live preview...</div>
+          <!-- DM Format Selector -->
+          <div class="dm-type-toggle-group">
+            <button type="button" class="dm-type-btn active" id="btnDmTypeText" onclick="setDmType('text')">
+              💬 PLAIN TEXT MESSAGE
+            </button>
+            <button type="button" class="dm-type-btn" id="btnDmTypeCard" onclick="setDmType('card')">
+              🎴 INTERACTIVE BUTTON CARD
+            </button>
+          </div>
+          <input type="hidden" id="campDmType" value="text">
+
+          <!-- Plain Text Section -->
+          <div id="dmTextSection">
+            <textarea id="campDmText" rows="4" placeholder="Greetings! Here is the resource you asked for:&#10;&#10;https://yourlink.com" oninput="updateLivePreviews()"></textarea>
+            <div class="field-hint">Follower receives a direct text message in their Instagram DM inbox.</div>
+          </div>
+
+          <!-- Interactive Button Card Section -->
+          <div id="dmCardSection" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+              <div>
+                <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">CARD TITLE (MAX 80 CHARS)</label>
+                <input type="text" id="campCardTitle" placeholder="e.g. EXCLUSIVE ACCESS PACK 🚀" oninput="updateLivePreviews()">
+              </div>
+              <div>
+                <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">BUTTON LABEL (MAX 20 CHARS)</label>
+                <input type="text" id="campCardBtnText" placeholder="e.g. 👉 OPEN LINK" oninput="updateLivePreviews()">
+              </div>
+            </div>
+
+            <div style="margin-bottom: 8px;">
+              <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">BUTTON TARGET DESTINATION URL (REQUIRED)</label>
+              <input type="text" id="campCardBtnUrl" placeholder="https://yourlink.com/resource" oninput="updateLivePreviews()">
+            </div>
+
+            <div style="margin-bottom: 8px;">
+              <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">CARD SUBTITLE / SUMMARY</label>
+              <textarea id="campCardSubtitle" rows="2" placeholder="Tap the button below for immediate access." oninput="updateLivePreviews()"></textarea>
+            </div>
+
+            <div>
+              <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">CARD BANNER IMAGE URL (OPTIONAL)</label>
+              <input type="text" id="campCardImageUrl" placeholder="https://... (or leave blank to use Reel cover)" oninput="updateLivePreviews()">
+              <div class="field-hint">Renders an official interactive card with a clickable native Instagram button.</div>
+            </div>
           </div>
         </div>
 
@@ -1373,8 +1598,85 @@
           <div class="step-heading">
             <span class="step-num">5</span> PUBLIC COMMENT REPLY (OPTIONAL)
           </div>
-          <input type="text" id="campPublicReply" placeholder="Sent to your DMs! Check your inbox ✨">
+          <input type="text" id="campPublicReply" placeholder="Sent to your DMs! Check your inbox ✨" oninput="updateLivePreviews()">
           <div class="field-hint">Leave blank if you prefer silent DMs without a public comment.</div>
+        </div>
+
+        <!-- Step 6: Dual Simulation & Live HUD Preview -->
+        <div class="form-step-section" style="background: rgba(0, 0, 0, 0.4); border-color: rgba(0, 240, 255, 0.25);">
+          <div class="step-heading">
+            <span class="step-num">6</span> DUAL LIVE SIMULATION // HUD PREVIEW
+          </div>
+          <div class="field-hint" style="margin-top: 0; margin-bottom: 12px;">Real-time rendering of how followers experience your comment reply and direct message.</div>
+
+          <div class="dual-preview-container">
+            <!-- Preview 1: Public Instagram Comment Thread -->
+            <div class="preview-phone-card">
+              <div class="preview-header-label">PUBLIC COMMENT THREAD</div>
+              <div class="ig-comment-wrapper">
+                <!-- User Comment -->
+                <div class="ig-comment-row">
+                  <div class="ig-comment-avatar">F</div>
+                  <div class="ig-comment-body">
+                    <span class="ig-comment-username">follower_user</span>
+                    <span>link please bro!! 🔥</span>
+                    <div class="ig-comment-meta">
+                      <span>2m ago</span>
+                      <span style="font-weight:600; cursor:pointer;">Reply</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Your Bot Reply -->
+                <div class="ig-comment-reply-thread">
+                  <div class="ig-comment-avatar creator">N</div>
+                  <div class="ig-comment-body">
+                    <span class="ig-comment-username">thenatrants</span>
+                    <span style="display:inline-block; width:8px; height:8px; background:var(--accent-core); border-radius:50%; margin-right:4px; vertical-align:middle;" title="Verified Creator"></span>
+                    <span id="previewCommentText" style="color: #e5e5e5;">Sent to your DMs! Check your inbox ✨</span>
+                    <div class="ig-comment-meta">
+                      <span>Just now</span>
+                      <span style="font-weight:600; cursor:pointer;">Reply</span>
+                      <span>❤️ 1</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview 2: Direct Message Inbox Preview -->
+            <div class="preview-phone-card">
+              <div class="preview-header-label">FOLLOWER DM INBOX</div>
+              <div style="font-size: 10px; color: var(--text-dim); margin-bottom: 8px; font-family: -apple-system, sans-serif;">
+                Direct Message from <strong style="color:#fff;">@thenatrants</strong>
+              </div>
+
+              <!-- Text Mode Preview -->
+              <div id="previewDmTextWrap">
+                <div class="dm-bubble" id="dmPreviewBubble">Type above to see live preview...</div>
+              </div>
+
+              <!-- Button Card Mode Preview -->
+              <div id="previewDmCardWrap" style="display: none;">
+                <div class="ig-card-template">
+                  <div class="ig-card-img-wrap" id="previewCardImgWrap">
+                    <img id="previewCardImg" class="ig-card-img" src="" style="display: none;">
+                    <div id="previewCardFallbackBanner" style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--accent-core); font-family:'Orbitron',monospace; font-size:11px; letter-spacing:1px; background:linear-gradient(135deg, rgba(0,240,255,0.2), rgba(245,158,11,0.2));">
+                      ✦ PROTOCOL ASSET
+                    </div>
+                  </div>
+                  <div class="ig-card-body">
+                    <div class="ig-card-title" id="previewCardTitle">EXCLUSIVE ACCESS PACK 🚀</div>
+                    <div class="ig-card-subtitle" id="previewCardSubtitle">Tap the button below for immediate access.</div>
+                  </div>
+                  <button type="button" class="ig-card-btn" id="previewCardBtn">👉 OPEN LINK</button>
+                </div>
+                <div style="font-size: 9px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); margin-top: 6px; text-align: right;" id="previewCardDomain">
+                  TARGET: yourlink.com
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
@@ -1645,10 +1947,19 @@
               </div>
 
               <div class="keyword-chips">
+                <span class="hud-chip" style="color:${c.dm_type === 'card' ? 'var(--accent-core)' : 'var(--text-muted)'}; border-color:${c.dm_type === 'card' ? 'var(--accent-core)' : 'var(--border-subtle)'};">
+                  ${c.dm_type === 'card' ? '🎴 BUTTON CARD' : '💬 PLAIN TEXT'}
+                </span>
                 ${c.trigger_keywords.split(',').map(k => `<span class="hud-chip">KEYWORD: ${escapeHtml(k.trim())}</span>`).join('')}
               </div>
 
-              <div class="payload-box">${escapeHtml(c.dm_text)}</div>
+              <div class="payload-box">
+                ${c.dm_type === 'card' ? `
+                  <div style="font-weight:700; color:#fff; margin-bottom:3px;">${escapeHtml(c.card_title || c.title)}</div>
+                  <div style="font-size:10px; color:var(--text-dim); margin-bottom:4px;">${escapeHtml(c.card_subtitle || '')}</div>
+                  <div style="color:var(--accent-core); font-size:10px; font-weight:700;">[${escapeHtml(c.card_button_text || 'LINK')}] ➔ ${escapeHtml(c.card_button_url || '')}</div>
+                ` : escapeHtml(c.dm_text)}
+              </div>
             </div>
 
             <div class="camp-footer">
@@ -1745,6 +2056,7 @@
         caption.textContent = (media.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
         idText.textContent = `Node ID: ${media.id}`;
       }
+      updateLivePreviews();
       saveDraft();
     }
 
@@ -1757,6 +2069,7 @@
       document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
       const banner = document.getElementById('lockedReelBanner');
       if (banner) banner.style.display = 'none';
+      updateLivePreviews();
       saveDraft();
     }
 
@@ -1777,6 +2090,7 @@
         caption.textContent = 'GLOBAL TARGET: ALL REELS & POSTS';
         idText.textContent = 'Auto-reply triggers across every reel & post';
       }
+      updateLivePreviews();
       saveDraft();
     }
 
@@ -1798,6 +2112,7 @@
         caption.textContent = `TARGET: ${val}`;
         idText.textContent = 'Custom Node / URL Locked';
       }
+      updateLivePreviews();
       saveDraft();
     }
 
@@ -1812,9 +2127,102 @@
       saveDraft();
     }
 
-    function updateDmPreview(val) {
-      const bubble = document.getElementById('dmPreviewBubble');
-      bubble.textContent = val.trim() || 'Type above to see live preview...';
+    function setDmType(type) {
+      playSfx('click');
+      const hiddenInput = document.getElementById('campDmType');
+      if (hiddenInput) hiddenInput.value = type;
+      const isCard = type === 'card';
+
+      const btnText = document.getElementById('btnDmTypeText');
+      const btnCard = document.getElementById('btnDmTypeCard');
+      if (btnText) btnText.classList.toggle('active', !isCard);
+      if (btnCard) btnCard.classList.toggle('active', isCard);
+
+      const secText = document.getElementById('dmTextSection');
+      const secCard = document.getElementById('dmCardSection');
+      if (secText) secText.style.display = isCard ? 'none' : 'block';
+      if (secCard) secCard.style.display = isCard ? 'block' : 'none';
+
+      const prevTextWrap = document.getElementById('previewDmTextWrap');
+      const prevCardWrap = document.getElementById('previewDmCardWrap');
+      if (prevTextWrap) prevTextWrap.style.display = isCard ? 'none' : 'block';
+      if (prevCardWrap) prevCardWrap.style.display = isCard ? 'block' : 'none';
+
+      updateLivePreviews();
+      saveDraft();
+    }
+
+    function updateLivePreviews() {
+      // 1. Comment Reply Preview
+      const commentInput = document.getElementById('campPublicReply');
+      const commentPreview = document.getElementById('previewCommentText');
+      if (commentInput && commentPreview) {
+        const val = commentInput.value.trim();
+        commentPreview.textContent = val ? val : 'Sent to your DMs! Check your inbox ✨';
+      }
+
+      // 2. DM Text Preview
+      const dmTextInput = document.getElementById('campDmText');
+      const dmPreviewBubble = document.getElementById('dmPreviewBubble');
+      if (dmTextInput && dmPreviewBubble) {
+        dmPreviewBubble.textContent = dmTextInput.value.trim() || 'Type above to see live preview...';
+      }
+
+      // 3. DM Button Card Preview
+      const cardTitleInput = document.getElementById('campCardTitle');
+      const cardSubtitleInput = document.getElementById('campCardSubtitle');
+      const cardBtnTextInput = document.getElementById('campCardBtnText');
+      const cardBtnUrlInput = document.getElementById('campCardBtnUrl');
+      const cardImgInput = document.getElementById('campCardImageUrl');
+
+      const cardTitle = document.getElementById('previewCardTitle');
+      const cardSubtitle = document.getElementById('previewCardSubtitle');
+      const cardBtn = document.getElementById('previewCardBtn');
+      const cardDomain = document.getElementById('previewCardDomain');
+      const cardImg = document.getElementById('previewCardImg');
+      const cardFallback = document.getElementById('previewCardFallbackBanner');
+
+      if (cardTitle) {
+        cardTitle.textContent = cardTitleInput?.value.trim() || 'EXCLUSIVE ACCESS PACK 🚀';
+      }
+      if (cardSubtitle) {
+        cardSubtitle.textContent = cardSubtitleInput?.value.trim() || 'Tap the button below for immediate access.';
+      }
+      if (cardBtn) {
+        cardBtn.textContent = cardBtnTextInput?.value.trim() || '👉 OPEN LINK';
+      }
+      if (cardDomain) {
+        const urlVal = cardBtnUrlInput?.value.trim() || '';
+        try {
+          if (urlVal) {
+            const parsed = new URL(urlVal.startsWith('http') ? urlVal : 'https://' + urlVal);
+            cardDomain.textContent = `TARGET: ${parsed.hostname}`;
+          } else {
+            cardDomain.textContent = 'TARGET: yourlink.com';
+          }
+        } catch (e) {
+          cardDomain.textContent = `TARGET: ${urlVal || 'yourlink.com'}`;
+        }
+      }
+
+      if (cardImg && cardFallback) {
+        const customImg = cardImgInput?.value.trim();
+        const reelImg = document.getElementById('lockedThumb')?.src;
+        const bannerVisible = document.getElementById('lockedReelBanner')?.style.display === 'flex';
+
+        if (customImg) {
+          cardImg.src = customImg;
+          cardImg.style.display = 'block';
+          cardFallback.style.display = 'none';
+        } else if (bannerVisible && reelImg && !reelImg.includes('data:image/svg+xml')) {
+          cardImg.src = reelImg;
+          cardImg.style.display = 'block';
+          cardFallback.style.display = 'none';
+        } else {
+          cardImg.style.display = 'none';
+          cardFallback.style.display = 'flex';
+        }
+      }
     }
 
     /* ==========================================================================
@@ -1829,12 +2237,18 @@
         mediaId: document.getElementById('campMediaId')?.value || '',
         manualMedia: document.getElementById('manualMediaInput')?.value || '',
         keywords: document.getElementById('campKeywords')?.value || '',
+        dmType: document.getElementById('campDmType')?.value || 'text',
         dmText: document.getElementById('campDmText')?.value || '',
         publicReply: document.getElementById('campPublicReply')?.value || '',
+        cardTitle: document.getElementById('campCardTitle')?.value || '',
+        cardSubtitle: document.getElementById('campCardSubtitle')?.value || '',
+        cardBtnText: document.getElementById('campCardBtnText')?.value || '',
+        cardBtnUrl: document.getElementById('campCardBtnUrl')?.value || '',
+        cardImageUrl: document.getElementById('campCardImageUrl')?.value || '',
         updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       };
 
-      if (draft.title || draft.mediaId || draft.manualMedia || draft.keywords || draft.dmText || draft.publicReply) {
+      if (draft.title || draft.mediaId || draft.manualMedia || draft.keywords || draft.dmText || draft.publicReply || draft.cardBtnUrl || draft.cardTitle) {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
         const statusEl = document.getElementById('draftStatusText');
         const dotEl = document.getElementById('draftIndicatorDot');
@@ -1846,31 +2260,36 @@
     function restoreDraft() {
       try {
         const raw = localStorage.getItem(DRAFT_KEY);
-        if (!raw) return false;
+        if (!raw) {
+          updateLivePreviews();
+          return false;
+        }
         const draft = JSON.parse(raw);
-        if (!draft) return false;
+        if (!draft) {
+          updateLivePreviews();
+          return false;
+        }
 
         let hasData = false;
-        if (draft.title) {
-          document.getElementById('campTitle').value = draft.title;
-          hasData = true;
-        }
-        if (draft.keywords) {
-          document.getElementById('campKeywords').value = draft.keywords;
-          hasData = true;
-        }
-        if (draft.dmText) {
-          document.getElementById('campDmText').value = draft.dmText;
-          updateDmPreview(draft.dmText);
-          hasData = true;
-        }
-        if (draft.publicReply) {
-          document.getElementById('campPublicReply').value = draft.publicReply;
-          hasData = true;
-        }
+        if (draft.title) { document.getElementById('campTitle').value = draft.title; hasData = true; }
+        if (draft.keywords) { document.getElementById('campKeywords').value = draft.keywords; hasData = true; }
+        if (draft.dmText) { document.getElementById('campDmText').value = draft.dmText; hasData = true; }
+        if (draft.publicReply) { document.getElementById('campPublicReply').value = draft.publicReply; hasData = true; }
         if (draft.manualMedia) {
           const mInput = document.getElementById('manualMediaInput');
           if (mInput) mInput.value = draft.manualMedia;
+        }
+
+        if (draft.cardTitle) { document.getElementById('campCardTitle').value = draft.cardTitle; hasData = true; }
+        if (draft.cardSubtitle) { document.getElementById('campCardSubtitle').value = draft.cardSubtitle; hasData = true; }
+        if (draft.cardBtnText) { document.getElementById('campCardBtnText').value = draft.cardBtnText; hasData = true; }
+        if (draft.cardBtnUrl) { document.getElementById('campCardBtnUrl').value = draft.cardBtnUrl; hasData = true; }
+        if (draft.cardImageUrl) { document.getElementById('campCardImageUrl').value = draft.cardImageUrl; hasData = true; }
+
+        if (draft.dmType) {
+          setDmType(draft.dmType);
+        } else {
+          setDmType('text');
         }
 
         if (draft.mediaId) {
@@ -1904,6 +2323,8 @@
           });
         }
 
+        updateLivePreviews();
+
         const statusEl = document.getElementById('draftStatusText');
         if (statusEl && hasData) {
           statusEl.textContent = draft.updatedAt ? `DRAFT RESTORED (${draft.updatedAt})` : 'DRAFT RESTORED';
@@ -1911,6 +2332,7 @@
         return hasData;
       } catch (e) {
         console.warn('Draft restoration error:', e);
+        updateLivePreviews();
         return false;
       }
     }
@@ -1920,7 +2342,8 @@
       localStorage.removeItem(DRAFT_KEY);
       document.getElementById('campaignForm').reset();
       clearTargetReel();
-      document.getElementById('dmPreviewBubble').textContent = 'Type above to see live preview...';
+      setDmType('text');
+      updateLivePreviews();
       const statusEl = document.getElementById('draftStatusText');
       if (statusEl) statusEl.textContent = 'DRAFT CLEARED';
     }
@@ -1973,11 +2396,9 @@
         const defs = JSON.parse(raw);
         if (defs.title) document.getElementById('campTitle').value = defs.title;
         if (defs.keywords) document.getElementById('campKeywords').value = defs.keywords;
-        if (defs.dmText) {
-          document.getElementById('campDmText').value = defs.dmText;
-          updateDmPreview(defs.dmText);
-        }
+        if (defs.dmText) document.getElementById('campDmText').value = defs.dmText;
         if (defs.publicReply) document.getElementById('campPublicReply').value = defs.publicReply;
+        updateLivePreviews();
         saveDraft();
       } catch (e) {
         console.error('Error applying presets:', e);
@@ -2002,12 +2423,19 @@
       e.preventDefault();
       playSfx('deploy');
 
+      const dmType = document.getElementById('campDmType')?.value || 'text';
       const payload = {
         title: document.getElementById('campTitle').value,
         mediaId: document.getElementById('campMediaId').value.trim(),
         triggerKeywords: document.getElementById('campKeywords').value,
+        dmType: dmType,
         dmText: document.getElementById('campDmText').value,
-        publicReply: document.getElementById('campPublicReply').value
+        publicReply: document.getElementById('campPublicReply').value,
+        cardTitle: document.getElementById('campCardTitle')?.value.trim() || '',
+        cardSubtitle: document.getElementById('campCardSubtitle')?.value.trim() || '',
+        cardButtonText: document.getElementById('campCardBtnText')?.value.trim() || '',
+        cardButtonUrl: document.getElementById('campCardBtnUrl')?.value.trim() || '',
+        cardImageUrl: document.getElementById('campCardImageUrl')?.value.trim() || ''
       };
 
       try {
@@ -2022,7 +2450,8 @@
           loadCampaigns();
           loadStats();
         } else {
-          alert('Failed to deploy protocol');
+          const err = await res.json();
+          alert('Failed to deploy protocol: ' + (err.error || 'Check required fields'));
         }
       } catch (err) {
         alert('Error deploying protocol: ' + err.message);
@@ -2079,12 +2508,21 @@
       return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    // Attach real-time draft persistence listeners to form inputs
-    ['campTitle', 'campKeywords', 'campDmText', 'campPublicReply', 'manualMediaInput'].forEach(id => {
+    // Attach real-time live preview & draft persistence listeners to form inputs
+    [
+      'campTitle', 'campKeywords', 'campDmText', 'campPublicReply', 'manualMediaInput',
+      'campCardTitle', 'campCardSubtitle', 'campCardBtnText', 'campCardBtnUrl', 'campCardImageUrl'
+    ].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
-        el.addEventListener('input', saveDraft);
-        el.addEventListener('change', saveDraft);
+        el.addEventListener('input', () => {
+          updateLivePreviews();
+          saveDraft();
+        });
+        el.addEventListener('change', () => {
+          updateLivePreviews();
+          saveDraft();
+        });
       }
     });
 

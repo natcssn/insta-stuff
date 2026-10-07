@@ -126,9 +126,29 @@ app.get('/api/campaigns', (req, res) => {
 
 // Create new video campaign
 app.post('/api/campaigns', (req, res) => {
-  const { title, mediaId, postUrl, triggerKeywords, dmText, publicReply } = req.body;
-  if (!title || !triggerKeywords || !dmText) {
-    return res.status(400).json({ error: 'Title, keywords, and DM text are required' });
+  const {
+    title,
+    mediaId,
+    postUrl,
+    triggerKeywords,
+    dmText,
+    publicReply,
+    dmType = 'text',
+    cardTitle,
+    cardSubtitle,
+    cardButtonText,
+    cardButtonUrl,
+    cardImageUrl
+  } = req.body;
+
+  // Ensure fallback dmText exists if card mode is used
+  let finalDmText = (dmText || '').trim();
+  if (!finalDmText && dmType === 'card' && cardButtonUrl) {
+    finalDmText = `${cardTitle ? cardTitle + '\n\n' : ''}${cardSubtitle ? cardSubtitle + '\n\n' : ''}${cardButtonText ? cardButtonText + ': ' : ''}${cardButtonUrl}`;
+  }
+
+  if (!title || !triggerKeywords || (!finalDmText && !cardButtonUrl)) {
+    return res.status(400).json({ error: 'Title, keywords, and DM payload or button URL are required' });
   }
 
   const campaign = db.createCampaign({
@@ -136,11 +156,17 @@ app.post('/api/campaigns', (req, res) => {
     mediaId,
     postUrl,
     triggerKeywords,
-    dmText,
-    publicReply
+    dmText: finalDmText || cardButtonUrl,
+    publicReply,
+    dmType,
+    cardTitle,
+    cardSubtitle,
+    cardButtonText,
+    cardButtonUrl,
+    cardImageUrl
   });
 
-  console.log(`[Dashboard] Created new automation for video: "${title}" (Media ID: ${mediaId || 'All'})`);
+  console.log(`[Dashboard] Created new automation for video: "${title}" (Type: ${dmType}, Media ID: ${mediaId || 'All'})`);
   res.status(201).json(campaign);
 });
 

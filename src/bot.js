@@ -101,17 +101,26 @@ async function handleCommentEvent(changeValue) {
     let errorMessage = null;
 
     try {
-      // Step A: Send Direct Message with campaign-specific text
-      console.log(`🚀 Sending custom DM to @${username || userId} for campaign "${campaign.title}"...`);
+      // Step A: Send Direct Message with campaign-specific text or Interactive Button Card
+      const cardConfig = (campaign.dm_type === 'card' && campaign.card_button_url) ? {
+        title: campaign.card_title,
+        subtitle: campaign.card_subtitle,
+        buttonText: campaign.card_button_text,
+        buttonUrl: campaign.card_button_url,
+        imageUrl: campaign.card_image_url
+      } : null;
+
+      console.log(`🚀 Dispatching ${cardConfig ? 'Interactive Button Card' : 'Custom'} DM to @${username || userId} for campaign "${campaign.title}"...`);
       const dmResult = await instagramApi.sendPrivateReply({
         commentId,
         userId,
-        messageText: campaign.dm_text
+        messageText: campaign.dm_text,
+        cardConfig
       });
 
       if (dmResult.success) {
         dmSent = true;
-        console.log(`✅ DM successfully sent to @${username || userId}!`);
+        console.log(`✅ DM (${dmResult.format || 'text'}) successfully sent to @${username || userId}!`);
       } else {
         errorMessage = dmResult.error;
       }

@@ -47,6 +47,24 @@ db.exec(`
 try {
   db.exec('ALTER TABLE processed_comments ADD COLUMN campaign_id INTEGER;');
 } catch (_) {}
+try {
+  db.exec("ALTER TABLE campaigns ADD COLUMN dm_type TEXT DEFAULT 'text';");
+} catch (_) {}
+try {
+  db.exec('ALTER TABLE campaigns ADD COLUMN card_title TEXT;');
+} catch (_) {}
+try {
+  db.exec('ALTER TABLE campaigns ADD COLUMN card_subtitle TEXT;');
+} catch (_) {}
+try {
+  db.exec('ALTER TABLE campaigns ADD COLUMN card_button_text TEXT;');
+} catch (_) {}
+try {
+  db.exec('ALTER TABLE campaigns ADD COLUMN card_button_url TEXT;');
+} catch (_) {}
+try {
+  db.exec('ALTER TABLE campaigns ADD COLUMN card_image_url TEXT;');
+} catch (_) {}
 
 /**
  * Check if a comment has already been processed.
@@ -112,11 +130,30 @@ function restoreCampaignsFromBackup() {
         const data = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
         if (Array.isArray(data) && data.length > 0) {
           const insertStmt = db.prepare(`
-            INSERT INTO campaigns (id, title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO campaigns (
+              id, title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active,
+              dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           `);
           for (const c of data) {
-            insertStmt.run(c.id, c.title, c.media_id, c.post_url, c.trigger_keywords, c.dm_text, c.public_reply, c.is_active, c.created_at || new Date().toISOString());
+            insertStmt.run(
+              c.id,
+              c.title,
+              c.media_id,
+              c.post_url,
+              c.trigger_keywords,
+              c.dm_text,
+              c.public_reply,
+              c.is_active,
+              c.dm_type || 'text',
+              c.card_title || null,
+              c.card_subtitle || null,
+              c.card_button_text || null,
+              c.card_button_url || null,
+              c.card_image_url || null,
+              c.created_at || new Date().toISOString()
+            );
           }
           console.log(`✅ [Database] Restored ${data.length} campaign(s) from persistent backup.`);
           return;
@@ -131,12 +168,41 @@ function restoreCampaignsFromBackup() {
 // Restore on boot
 restoreCampaignsFromBackup();
 
-function createCampaign({ title, mediaId, postUrl, triggerKeywords, dmText, publicReply }) {
+function createCampaign({
+  title,
+  mediaId,
+  postUrl,
+  triggerKeywords,
+  dmText,
+  publicReply,
+  dmType = 'text',
+  cardTitle = null,
+  cardSubtitle = null,
+  cardButtonText = null,
+  cardButtonUrl = null,
+  cardImageUrl = null
+}) {
   const stmt = db.prepare(`
-    INSERT INTO campaigns (title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active)
-    VALUES (?, ?, ?, ?, ?, ?, 1)
+    INSERT INTO campaigns (
+      title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active,
+      dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url
+    )
+    VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
   `);
-  const info = stmt.run(title, mediaId || null, postUrl || null, triggerKeywords, dmText, publicReply || null);
+  const info = stmt.run(
+    title,
+    mediaId || null,
+    postUrl || null,
+    triggerKeywords,
+    dmText,
+    publicReply || null,
+    dmType || 'text',
+    cardTitle || null,
+    cardSubtitle || null,
+    cardButtonText || null,
+    cardButtonUrl || null,
+    cardImageUrl || null
+  );
   saveCampaignsBackup();
   return getCampaignById(info.lastInsertRowid);
 }
