@@ -31,21 +31,62 @@ async function replyToComment(commentId, replyText) {
 }
 
 /**
- * Send a private DM to the commenter (Supports Plain Text OR Interactive Button Card).
+ * Send a private DM to the commenter (Supports Clean Button Template or Plain Text).
  */
 async function sendPrivateReply({ commentId, userId, messageText, cardConfig }) {
-  // Option A: Send Interactive Generic Template Button Card
+  // Option A: Send Interactive Link Button (Image 2 style: Clean text bubble + Click button)
   if (cardConfig && cardConfig.buttonUrl) {
+    const btnTitle = String(cardConfig.buttonText || 'Click ✅').slice(0, 20);
+    const textContent = (messageText || cardConfig.title || 'Tap the link below:').trim();
+
     if (config.DRY_RUN) {
-      console.log(`[DRY RUN] Would send Interactive Button Card to user ${userId} for comment ${commentId}:`);
-      console.log(`Title: ${cardConfig.title} | Subtitle: ${cardConfig.subtitle} | Button: [${cardConfig.buttonText}] -> ${cardConfig.buttonUrl}`);
-      return { success: true, dry_run: true, format: 'card' };
+      console.log(`[DRY RUN] Would send Link Button DM to user ${userId} for comment ${commentId}:`);
+      console.log(`Text: "${textContent}" | Button: [${btnTitle}] -> ${cardConfig.buttonUrl}`);
+      return { success: true, dry_run: true, format: 'button' };
     }
 
+    const recipient = commentId ? { comment_id: commentId } : { id: userId };
+    const url = `${BASE_URL}/me/messages`;
+
+    // Try 1: Button Template (Direct Instagram chat bubble with button at bottom - exactly like Image 2)
+    if (!cardConfig.imageUrl) {
+      try {
+        const buttonPayload = {
+          recipient,
+          message: {
+            attachment: {
+              type: 'template',
+              payload: {
+                template_type: 'button',
+                text: textContent,
+                buttons: [
+                  {
+                    type: 'web_url',
+                    url: cardConfig.buttonUrl.trim(),
+                    title: btnTitle
+                  }
+                ]
+              }
+            }
+          }
+        };
+
+        const res = await axios.post(url, buttonPayload, {
+          headers: { 'Content-Type': 'application/json' },
+          params: { access_token: config.PAGE_ACCESS_TOKEN }
+        });
+
+        console.log(`✅ [Meta API] Clean Button DM successfully delivered to comment ${commentId}`);
+        return { success: true, data: res.data, format: 'button' };
+      } catch (btnErr) {
+        console.warn(`⚠️ [Meta API] Button template notice (${btnErr.response?.data?.error?.message || btnErr.message}). Trying generic element format...`);
+      }
+    }
+
+    // Try 2: Generic Template (no image header unless explicitly specified)
     try {
-      const url = `${BASE_URL}/me/messages`;
-      const payload = {
-        recipient: commentId ? { comment_id: commentId } : { id: userId },
+      const genericPayload = {
+        recipient,
         message: {
           attachment: {
             type: 'template',
@@ -53,14 +94,14 @@ async function sendPrivateReply({ commentId, userId, messageText, cardConfig }) 
               template_type: 'generic',
               elements: [
                 {
-                  title: String(cardConfig.title || 'Exclusive Access').slice(0, 80),
-                  subtitle: String(cardConfig.subtitle || 'Tap the link below to view:').slice(0, 80),
+                  title: (cardConfig.title || textContent).slice(0, 80),
+                  ...(cardConfig.subtitle ? { subtitle: cardConfig.subtitle.slice(0, 80) } : (textContent.length > 80 ? { subtitle: textContent.slice(80, 160) } : {})),
                   ...(cardConfig.imageUrl ? { image_url: cardConfig.imageUrl } : {}),
                   buttons: [
                     {
                       type: 'web_url',
                       url: cardConfig.buttonUrl.trim(),
-                      title: String(cardConfig.buttonText || '👉 OPEN LINK').slice(0, 20)
+                      title: btnTitle
                     }
                   ]
                 }
@@ -70,23 +111,20 @@ async function sendPrivateReply({ commentId, userId, messageText, cardConfig }) 
         }
       };
 
-      const response = await axios.post(url, payload, {
+      const res = await axios.post(url, genericPayload, {
         headers: { 'Content-Type': 'application/json' },
         params: { access_token: config.PAGE_ACCESS_TOKEN }
       });
 
-      console.log(`✅ [Meta API] Interactive Button Card DM successfully delivered to comment ${commentId}`);
-      return { success: true, data: response.data, format: 'card' };
-    } catch (cardError) {
-      const errDetails = cardError.response ? JSON.stringify(cardError.response.data) : cardError.message;
-      console.warn(`⚠️ [Meta API Template Warning] Generic Card template rejected by Meta (${errDetails}). Executing fail-safe text DM fallback...`);
-
-      // Fail-Safe Fallback: Deliver as clean, high-priority Text DM so follower NEVER misses the link!
-      const fallbackText = `${cardConfig.title ? cardConfig.title + '\n\n' : ''}${cardConfig.subtitle ? cardConfig.subtitle + '\n\n' : ''}${cardConfig.buttonText ? cardConfig.buttonText + ': ' : ''}${cardConfig.buttonUrl}`;
+      console.log(`✅ [Meta API] Generic Template DM successfully delivered to comment ${commentId}`);
+      return { success: true, data: res.data, format: 'card' };
+    } catch (genericErr) {
+      console.warn(`⚠️ [Meta API] Generic template rejected. Falling back to clean text DM...`);
+      const fallbackText = `${textContent}\n\n${btnTitle}: ${cardConfig.buttonUrl}`;
       return await sendPrivateReply({
         commentId,
         userId,
-        messageText: fallbackText || messageText
+        messageText: fallbackText
       });
     }
   }

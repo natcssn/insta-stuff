@@ -102,15 +102,16 @@ async function handleCommentEvent(changeValue) {
 
     try {
       // Step A: Send Direct Message with campaign-specific text or Interactive Button Card
-      const cardConfig = (campaign.dm_type === 'card' && campaign.card_button_url) ? {
-        title: campaign.card_title,
-        subtitle: campaign.card_subtitle,
-        buttonText: campaign.card_button_text,
+      const hasButton = Boolean(campaign.card_button_url);
+      const cardConfig = hasButton ? {
+        title: campaign.card_title || null,
+        subtitle: campaign.card_subtitle || null,
+        buttonText: campaign.card_button_text || 'Click ✅',
         buttonUrl: campaign.card_button_url,
-        imageUrl: campaign.card_image_url
+        imageUrl: campaign.dm_type === 'card' ? campaign.card_image_url : null
       } : null;
 
-      console.log(`🚀 Dispatching ${cardConfig ? 'Interactive Button Card' : 'Custom'} DM to @${username || userId} for campaign "${campaign.title}"...`);
+      console.log(`🚀 Dispatching ${cardConfig ? (cardConfig.imageUrl ? 'Image Card' : 'Link Button') : 'Text'} DM to @${username || userId} for campaign "${campaign.title}"...`);
       const dmResult = await instagramApi.sendPrivateReply({
         commentId,
         userId,

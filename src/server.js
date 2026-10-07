@@ -141,10 +141,12 @@ app.post('/api/campaigns', (req, res) => {
     cardImageUrl
   } = req.body;
 
-  // Ensure fallback dmText exists if card mode is used
+  // Ensure fallback dmText exists if card or button mode is used
   let finalDmText = (dmText || '').trim();
-  if (!finalDmText && dmType === 'card' && cardButtonUrl) {
-    finalDmText = `${cardTitle ? cardTitle + '\n\n' : ''}${cardSubtitle ? cardSubtitle + '\n\n' : ''}${cardButtonText ? cardButtonText + ': ' : ''}${cardButtonUrl}`;
+  const finalBtnText = (cardButtonText || '').trim() || (cardButtonUrl ? 'Click ✅' : null);
+
+  if (!finalDmText && cardButtonUrl) {
+    finalDmText = `${cardTitle ? cardTitle + '\n\n' : ''}${cardSubtitle ? cardSubtitle + '\n\n' : ''}${finalBtnText ? finalBtnText + ': ' : ''}${cardButtonUrl}`;
   }
 
   if (!title || !triggerKeywords || (!finalDmText && !cardButtonUrl)) {
@@ -159,11 +161,11 @@ app.post('/api/campaigns', (req, res) => {
     dmText: finalDmText || cardButtonUrl,
     publicReply,
     dmType,
-    cardTitle,
-    cardSubtitle,
-    cardButtonText,
-    cardButtonUrl,
-    cardImageUrl
+    cardTitle: cardTitle || null,
+    cardSubtitle: cardSubtitle || null,
+    cardButtonText: finalBtnText,
+    cardButtonUrl: cardButtonUrl?.trim() || null,
+    cardImageUrl: cardImageUrl?.trim() || null
   });
 
   console.log(`[Dashboard] Created new automation for video: "${title}" (Type: ${dmType}, Media ID: ${mediaId || 'All'})`);

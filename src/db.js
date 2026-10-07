@@ -124,40 +124,36 @@ function saveCampaignsBackup() {
 
 function restoreCampaignsFromBackup() {
   try {
-    const count = db.prepare('SELECT COUNT(*) as count FROM campaigns').get().count;
-    if (count === 0) {
-      if (fs.existsSync(backupPath)) {
-        const data = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
-        if (Array.isArray(data) && data.length > 0) {
-          const insertStmt = db.prepare(`
-            INSERT INTO campaigns (
-              id, title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active,
-              dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url, created_at
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          `);
-          for (const c of data) {
-            insertStmt.run(
-              c.id,
-              c.title,
-              c.media_id,
-              c.post_url,
-              c.trigger_keywords,
-              c.dm_text,
-              c.public_reply,
-              c.is_active,
-              c.dm_type || 'text',
-              c.card_title || null,
-              c.card_subtitle || null,
-              c.card_button_text || null,
-              c.card_button_url || null,
-              c.card_image_url || null,
-              c.created_at || new Date().toISOString()
-            );
-          }
-          console.log(`✅ [Database] Restored ${data.length} campaign(s) from persistent backup.`);
-          return;
+    if (fs.existsSync(backupPath)) {
+      const data = JSON.parse(fs.readFileSync(backupPath, 'utf8'));
+      if (Array.isArray(data) && data.length > 0) {
+        const insertStmt = db.prepare(`
+          INSERT OR IGNORE INTO campaigns (
+            id, title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active,
+            dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url, created_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        for (const c of data) {
+          insertStmt.run(
+            c.id,
+            c.title,
+            c.media_id,
+            c.post_url,
+            c.trigger_keywords,
+            c.dm_text,
+            c.public_reply,
+            c.is_active,
+            c.dm_type || 'text',
+            c.card_title || null,
+            c.card_subtitle || null,
+            c.card_button_text || null,
+            c.card_button_url || null,
+            c.card_image_url || null,
+            c.created_at || new Date().toISOString()
+          );
         }
+        console.log(`✅ [Database] Verified persistent backup sync (${data.length} campaigns).`);
       }
     }
   } catch (err) {

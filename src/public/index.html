@@ -985,6 +985,57 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
+    /* Instagram DM Bubble with Native Interactive Button (Image 2 format) */
+    .ig-button-dm-bubble {
+      background: #262626;
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 290px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .ig-button-dm-text {
+      color: #fff;
+      font-size: 12px;
+      padding: 10px 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .ig-button-dm-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.07);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      color: #0095f6;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .ig-button-dm-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .form-responsive-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 768px) {
+      .form-responsive-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
     /* Instagram Generic Template Card UI Simulation */
     .ig-card-template {
       background: #121212;
@@ -1103,211 +1154,270 @@
     }
 
     @media (max-width: 768px) {
+      * {
+        box-sizing: border-box !important;
+      }
+
+      html, body {
+        overflow-x: hidden !important;
+        max-width: 100vw !important;
+        width: 100% !important;
+      }
+
       .container {
-        padding: 14px 12px 60px;
+        padding: 12px 10px 60px !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
       }
       
       header {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 14px;
-        gap: 14px;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 12px !important;
+        gap: 12px !important;
+        max-width: 100% !important;
       }
 
       .brand-group {
-        gap: 12px;
+        gap: 10px !important;
       }
 
       .arc-reactor {
-        width: 42px;
-        height: 42px;
-        min-width: 42px;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
       }
 
       .brand-title {
-        font-size: 16px;
-        flex-wrap: wrap;
-        gap: 8px;
+        font-size: 15px !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
       }
 
       .brand-sub {
-        font-size: 9.5px;
-        line-height: 1.3;
+        font-size: 9px !important;
+        line-height: 1.3 !important;
       }
 
       .hud-controls {
-        display: flex;
-        gap: 8px;
-        width: 100%;
+        display: flex !important;
+        gap: 8px !important;
+        width: 100% !important;
       }
 
       .audio-toggle, .hud-controls .stark-btn {
-        flex: 1;
-        min-height: 42px;
-        padding: 8px 12px;
-        font-size: 11px;
-        justify-content: center;
-        text-align: center;
+        flex: 1 !important;
+        min-height: 40px !important;
+        padding: 8px 10px !important;
+        font-size: 10.5px !important;
+        justify-content: center !important;
+        text-align: center !important;
       }
 
       .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 16px !important;
       }
 
       .spotlight-card {
-        padding: 14px 12px;
+        padding: 12px 10px !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
       }
 
       .card-label {
-        font-size: 9.5px;
-        letter-spacing: 0.8px;
+        font-size: 8.5px !important;
+        letter-spacing: 0.5px !important;
       }
 
       .card-telemetry-badge {
-        display: none;
+        display: none !important;
       }
 
       .card-value {
-        font-size: 26px;
+        font-size: 22px !important;
       }
 
       .hud-panel {
-        padding: 16px 14px;
-        margin-bottom: 20px;
+        padding: 14px 10px !important;
+        margin-bottom: 16px !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
       }
 
       .panel-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
       }
 
       .panel-title {
-        font-size: 13px;
-      }
-
-      .panel-header .stark-btn-primary {
-        width: 100%;
-        min-height: 44px;
-        justify-content: center;
-        font-size: 12px;
-      }
-
-      .campaigns-container {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
-
-      .campaign-hud-card {
-        padding: 16px 14px;
-      }
-      .panel-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        font-size: 12px !important;
       }
 
       .panel-actions {
-        width: 100%;
-        display: flex;
-        gap: 8px;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
       }
 
       .panel-actions .stark-btn {
-        flex: 1;
-        justify-content: center;
-        padding: 8px 10px;
-        font-size: 10px;
+        width: 100% !important;
+        min-height: 42px !important;
+        justify-content: center !important;
+        font-size: 11px !important;
+        text-align: center !important;
+      }
+
+      .campaigns-container {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        width: 100% !important;
+      }
+
+      .campaign-hud-card {
+        padding: 14px 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+      }
+
+      .camp-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+      }
+
+      .camp-header > div:first-child {
+        min-width: 0 !important;
+        flex: 1 !important;
       }
 
       .camp-title {
-        font-size: 14px;
+        font-size: 13px !important;
+        word-break: break-all !important;
+        overflow-wrap: break-word !important;
+      }
+
+      .camp-target {
+        font-size: 10px !important;
+        word-break: break-all !important;
       }
 
       .payload-box {
-        font-size: 11px;
-        max-height: 80px;
+        font-size: 11px !important;
+        max-height: 80px !important;
+        max-width: 100% !important;
+        word-break: break-word !important;
+      }
+
+      .camp-footer {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
       }
 
       /* Modal Mobile Overhaul */
       .modal-backdrop {
-        padding: 10px;
+        padding: 6px !important;
+        overflow-x: hidden !important;
       }
 
       .modal-frame {
-        padding: 20px 14px;
-        width: 100%;
-        max-height: 94vh;
-        border-radius: 8px;
+        padding: 16px 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 95vh !important;
+        border-radius: 6px !important;
+        overflow-x: hidden !important;
       }
 
       .modal-title {
-        font-size: 15px;
+        font-size: 14px !important;
+        letter-spacing: 1px !important;
+      }
+
+      .modal-sub {
+        font-size: 9.5px !important;
+        margin-bottom: 14px !important;
       }
 
       .form-step-section {
-        padding: 12px;
-        margin-bottom: 12px;
+        padding: 10px !important;
+        margin-bottom: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
       }
 
       input[type="text"], textarea {
-        font-size: 16px !important; /* Prevents iOS Safari auto-zoom */
-        padding: 12px;
+        font-size: 14px !important;
+        padding: 10px 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
       }
 
       .preset-chips-row {
-        gap: 6px;
+        gap: 6px !important;
       }
 
       .chip-btn {
-        padding: 6px 10px;
-        font-size: 11px;
-        min-height: 32px;
+        padding: 5px 8px !important;
+        font-size: 10.5px !important;
+        min-height: 30px !important;
       }
 
-      .dm-preview-card {
-        max-width: 100%;
+      .dual-preview-container {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        width: 100% !important;
+      }
+
+      .preview-phone-card {
+        padding: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
       }
 
       .modal-frame form > div:last-child {
-        flex-direction: column-reverse;
-        gap: 8px;
-        margin-top: 18px !important;
+        flex-direction: column-reverse !important;
+        gap: 8px !important;
+        margin-top: 14px !important;
       }
 
       .modal-frame form > div:last-child button {
-        width: 100%;
-        min-height: 46px;
-        justify-content: center;
-        font-size: 12px;
-      }
-
-      .mobile-scroll-hint {
-        display: block;
+        width: 100% !important;
+        min-height: 44px !important;
+        justify-content: center !important;
+        font-size: 12px !important;
       }
 
       .media-hud-carousel {
-        padding: 6px 4px 10px;
-        gap: 8px;
+        padding: 6px 4px 10px !important;
+        gap: 8px !important;
       }
 
       .media-card-item {
-        flex: 0 0 92px;
-        width: 92px;
-        min-width: 92px;
-        max-width: 92px;
-        padding: 5px;
+        flex: 0 0 90px !important;
+        width: 90px !important;
+        min-width: 90px !important;
+        max-width: 90px !important;
+        padding: 4px !important;
       }
 
       .media-thumb {
-        height: 112px;
+        height: 105px !important;
       }
 
       .telemetry-table th, .telemetry-table td {
-        padding: 10px 12px;
-        font-size: 10px;
+        padding: 8px 10px !important;
+        font-size: 9.5px !important;
       }
     }
 
@@ -1547,37 +1657,61 @@
 
           <!-- DM Format Selector -->
           <div class="dm-type-toggle-group">
-            <button type="button" class="dm-type-btn active" id="btnDmTypeText" onclick="setDmType('text')">
-              💬 PLAIN TEXT MESSAGE
+            <button type="button" class="dm-type-btn active" id="btnDmTypeText" onclick="setDmType('button')">
+              💬 DIRECT MESSAGE (WITH BUTTON)
             </button>
             <button type="button" class="dm-type-btn" id="btnDmTypeCard" onclick="setDmType('card')">
-              🎴 INTERACTIVE BUTTON CARD
+              🎴 HERO CARD (IMAGE BANNER)
             </button>
           </div>
-          <input type="hidden" id="campDmType" value="text">
+          <input type="hidden" id="campDmType" value="button">
 
-          <!-- Plain Text Section -->
+          <!-- Normal Direct Message Section (Image 2 Style - Clean Chat Bubble + Optional Button) -->
           <div id="dmTextSection">
-            <textarea id="campDmText" rows="4" placeholder="Greetings! Here is the resource you asked for:&#10;&#10;https://yourlink.com" oninput="updateLivePreviews()"></textarea>
-            <div class="field-hint">Follower receives a direct text message in their Instagram DM inbox.</div>
+            <div style="margin-bottom: 12px;">
+              <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">MESSAGE TEXT BODY</label>
+              <textarea id="campDmText" rows="3" placeholder="Wassup, NatBot here 🍑 ... Here's the link to the resource you asked for:" oninput="updateLivePreviews()"></textarea>
+              <div class="field-hint">Follower receives a direct message in their Instagram inbox.</div>
+            </div>
+
+            <!-- Optional Link Button Inside Chat Bubble -->
+            <div style="background: rgba(0, 240, 255, 0.04); border: 1px dashed rgba(0, 240, 255, 0.28); border-radius: 6px; padding: 12px 14px;">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:700; color:var(--accent-core); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                🔗 ATTACH INTERACTIVE LINK BUTTON (OPTIONAL)
+              </div>
+              <div style="font-size:10.5px; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
+                Attaches a native clickable button inside the chat bubble (Image 2 format, zero bulky banner). By default shows "Click ✅". Leave URL empty for text-only.
+              </div>
+
+              <div class="form-responsive-grid">
+                <div>
+                  <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">BUTTON TARGET DESTINATION URL</label>
+                  <input type="text" id="campCardBtnUrl" placeholder="https://yourlink.com/resource" oninput="updateLivePreviews()">
+                </div>
+                <div>
+                  <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">BUTTON LABEL (DEFAULT: Click ✅)</label>
+                  <input type="text" id="campCardBtnText" value="Click ✅" placeholder="Click ✅" oninput="updateLivePreviews()">
+                </div>
+              </div>
+            </div>
           </div>
 
-          <!-- Interactive Button Card Section -->
+          <!-- Hero Card Section (Image 1 Format With Top Banner Image) -->
           <div id="dmCardSection" style="display: none;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+            <div class="form-responsive-grid" style="margin-bottom: 8px;">
               <div>
                 <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">CARD TITLE (MAX 80 CHARS)</label>
                 <input type="text" id="campCardTitle" placeholder="e.g. EXCLUSIVE ACCESS PACK 🚀" oninput="updateLivePreviews()">
               </div>
               <div>
                 <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">BUTTON LABEL (MAX 20 CHARS)</label>
-                <input type="text" id="campCardBtnText" placeholder="e.g. 👉 OPEN LINK" oninput="updateLivePreviews()">
+                <input type="text" id="campCardBtnTextHero" value="Click ✅" placeholder="Click ✅" oninput="updateLivePreviews()">
               </div>
             </div>
 
             <div style="margin-bottom: 8px;">
               <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">BUTTON TARGET DESTINATION URL (REQUIRED)</label>
-              <input type="text" id="campCardBtnUrl" placeholder="https://yourlink.com/resource" oninput="updateLivePreviews()">
+              <input type="text" id="campCardBtnUrlHero" placeholder="https://yourlink.com/resource" oninput="updateLivePreviews()">
             </div>
 
             <div style="margin-bottom: 8px;">
@@ -1588,7 +1722,7 @@
             <div>
               <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">CARD BANNER IMAGE URL (OPTIONAL)</label>
               <input type="text" id="campCardImageUrl" placeholder="https://... (or leave blank to use Reel cover)" oninput="updateLivePreviews()">
-              <div class="field-hint">Renders an official interactive card with a clickable native Instagram button.</div>
+              <div class="field-hint">Renders an interactive card with a top image banner.</div>
             </div>
           </div>
         </div>
@@ -1651,25 +1785,37 @@
                 Direct Message from <strong style="color:#fff;">@thenatrants</strong>
               </div>
 
-              <!-- Text Mode Preview -->
+              <!-- Normal Mode Preview (Text or Clean Button Bubble) -->
               <div id="previewDmTextWrap">
+                <!-- Text Only Bubble -->
                 <div class="dm-bubble" id="dmPreviewBubble">Type above to see live preview...</div>
+
+                <!-- Image 2 Style Native Instagram Button Bubble -->
+                <div class="ig-button-dm-bubble" id="dmPreviewButtonBubble" style="display: none;">
+                  <div class="ig-button-dm-text" id="dmPreviewButtonText">Wassup, NatBot here 🍑 ... Here's the link:</div>
+                  <div class="ig-button-dm-btn" id="dmPreviewButtonBtn">
+                    <span id="dmPreviewButtonLabel">Click ✅</span> ↗
+                  </div>
+                </div>
+                <div style="font-size: 9px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); margin-top: 6px; text-align: right; display: none;" id="previewBtnDomain">
+                  TARGET: yourlink.com
+                </div>
               </div>
 
-              <!-- Button Card Mode Preview -->
+              <!-- Hero Card Mode Preview -->
               <div id="previewDmCardWrap" style="display: none;">
                 <div class="ig-card-template">
                   <div class="ig-card-img-wrap" id="previewCardImgWrap">
                     <img id="previewCardImg" class="ig-card-img" src="" style="display: none;">
                     <div id="previewCardFallbackBanner" style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--accent-core); font-family:'Orbitron',monospace; font-size:11px; letter-spacing:1px; background:linear-gradient(135deg, rgba(0,240,255,0.2), rgba(245,158,11,0.2));">
-                      ✦ PROTOCOL ASSET
+                      ✦ HERO BANNER
                     </div>
                   </div>
                   <div class="ig-card-body">
                     <div class="ig-card-title" id="previewCardTitle">EXCLUSIVE ACCESS PACK 🚀</div>
                     <div class="ig-card-subtitle" id="previewCardSubtitle">Tap the button below for immediate access.</div>
                   </div>
-                  <button type="button" class="ig-card-btn" id="previewCardBtn">👉 OPEN LINK</button>
+                  <button type="button" class="ig-card-btn" id="previewCardBtn">Click ✅</button>
                 </div>
                 <div style="font-size: 9px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); margin-top: 6px; text-align: right;" id="previewCardDomain">
                   TARGET: yourlink.com
@@ -1731,6 +1877,24 @@
           </div>
           <input type="text" id="defPublicReply" placeholder="Sent to your DMs! Check your inbox ✨">
           <div class="field-hint">Standard public acknowledgement comment.</div>
+        </div>
+
+        <!-- Default Step 5: Default Link Button (Optional) -->
+        <div class="form-step-section">
+          <div class="step-heading">
+            <span class="step-num">5</span> DEFAULT LINK BUTTON (OPTIONAL)
+          </div>
+          <div class="form-responsive-grid" style="margin-bottom: 8px;">
+            <div>
+              <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">DEFAULT TARGET URL</label>
+              <input type="text" id="defBtnUrl" placeholder="https://yourlink.com">
+            </div>
+            <div>
+              <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">DEFAULT BUTTON LABEL</label>
+              <input type="text" id="defBtnText" value="Click ✅" placeholder="Click ✅">
+            </div>
+          </div>
+          <div class="field-hint">Standard button destination URL and label (defaults to "Click ✅").</div>
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
@@ -1917,63 +2081,110 @@
       try {
         const res = await fetch('/api/campaigns');
         const campaigns = await res.json();
-        const container = document.getElementById('campaigns-container');
 
-        if (campaigns.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state" style="grid-column: 1/-1;">
-              <div class="empty-title">NO ACTIVE CAMPAIGNS</div>
-              <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:16px;">
-                Deploy a target automation to begin responding to qualified comments.
-              </div>
-              <button class="stark-btn stark-btn-primary" onclick="openNewCampaignModal()">+ INITIALIZE PROTOCOL</button>
-            </div>
-          `;
-          return;
+        if (Array.isArray(campaigns) && campaigns.length > 0) {
+          // Persist a backup snapshot in browser localStorage
+          localStorage.setItem('shelly_saved_campaigns', JSON.stringify(campaigns));
+        } else if (Array.isArray(campaigns) && campaigns.length === 0) {
+          // Fallback auto-restore from browser backup if server disk was ever reset
+          const cached = localStorage.getItem('shelly_saved_campaigns');
+          if (cached) {
+            try {
+              const list = JSON.parse(cached);
+              if (Array.isArray(list) && list.length > 0) {
+                console.log('⚡ [Protocol Guard] Auto-restoring campaigns to server...');
+                for (const camp of list) {
+                  await fetch('/api/campaigns', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      title: camp.title,
+                      mediaId: camp.media_id,
+                      postUrl: camp.post_url,
+                      triggerKeywords: camp.trigger_keywords,
+                      dmType: camp.dm_type || 'button',
+                      dmText: camp.dm_text,
+                      publicReply: camp.public_reply,
+                      cardTitle: camp.card_title,
+                      cardSubtitle: camp.card_subtitle,
+                      cardButtonText: camp.card_button_text,
+                      cardButtonUrl: camp.card_button_url,
+                      cardImageUrl: camp.card_image_url
+                    })
+                  });
+                }
+                const recheck = await fetch('/api/campaigns');
+                const recheckedData = await recheck.json();
+                if (recheckedData.length > 0) {
+                  return renderCampaigns(recheckedData);
+                }
+              }
+            } catch (err) {}
+          }
         }
 
-        container.innerHTML = campaigns.map(c => `
-          <div class="campaign-hud-card ${c.is_active ? 'active-state' : 'paused-state'}">
-            <div>
-              <div class="camp-header">
-                <div>
-                  <div class="camp-title">${escapeHtml(c.title)}</div>
-                  <div class="camp-target">TARGET REEL // ${escapeHtml(c.media_id || 'ALL_POSTS')}</div>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" ${c.is_active ? 'checked' : ''} onchange="toggleCampaign(${c.id}, this.checked)">
-                  <span class="slider"></span>
-                </label>
-              </div>
-
-              <div class="keyword-chips">
-                <span class="hud-chip" style="color:${c.dm_type === 'card' ? 'var(--accent-core)' : 'var(--text-muted)'}; border-color:${c.dm_type === 'card' ? 'var(--accent-core)' : 'var(--border-subtle)'};">
-                  ${c.dm_type === 'card' ? '🎴 BUTTON CARD' : '💬 PLAIN TEXT'}
-                </span>
-                ${c.trigger_keywords.split(',').map(k => `<span class="hud-chip">KEYWORD: ${escapeHtml(k.trim())}</span>`).join('')}
-              </div>
-
-              <div class="payload-box">
-                ${c.dm_type === 'card' ? `
-                  <div style="font-weight:700; color:#fff; margin-bottom:3px;">${escapeHtml(c.card_title || c.title)}</div>
-                  <div style="font-size:10px; color:var(--text-dim); margin-bottom:4px;">${escapeHtml(c.card_subtitle || '')}</div>
-                  <div style="color:var(--accent-core); font-size:10px; font-weight:700;">[${escapeHtml(c.card_button_text || 'LINK')}] ➔ ${escapeHtml(c.card_button_url || '')}</div>
-                ` : escapeHtml(c.dm_text)}
-              </div>
-            </div>
-
-            <div class="camp-footer">
-              <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:${c.is_active ? 'var(--accent-core)' : 'var(--text-dim)'}; letter-spacing:1px; font-weight:600;">
-                STATUS: ${c.is_active ? 'ACTIVE & LISTENING' : 'STANDBY (PAUSED)'}
-              </span>
-              <button class="btn-terminate" onclick="deleteCampaign(${c.id})">TERMINATE</button>
-            </div>
-          </div>
-        `).join('');
-
+        renderCampaigns(campaigns);
       } catch (err) {
         console.error('Campaigns fetch error:', err);
       }
+    }
+
+    function renderCampaigns(campaigns) {
+      const container = document.getElementById('campaigns-container');
+      if (!Array.isArray(campaigns) || campaigns.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <div class="empty-title">NO ACTIVE CAMPAIGNS</div>
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:16px;">
+              Deploy a target automation to begin responding to qualified comments.
+            </div>
+            <button class="stark-btn stark-btn-primary" onclick="openNewCampaignModal()">+ INITIALIZE PROTOCOL</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = campaigns.map(c => `
+        <div class="campaign-hud-card ${c.is_active ? 'active-state' : 'paused-state'}">
+          <div>
+            <div class="camp-header">
+              <div>
+                <div class="camp-title">${escapeHtml(c.title)}</div>
+                <div class="camp-target">TARGET REEL // ${escapeHtml(c.media_id || 'ALL_POSTS')}</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" ${c.is_active ? 'checked' : ''} onchange="toggleCampaign(${c.id}, this.checked)">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="keyword-chips">
+              <span class="hud-chip" style="color:${c.dm_type === 'card' ? 'var(--accent-core)' : (c.card_button_url ? 'var(--accent-green)' : 'var(--text-muted)')}; border-color:${c.dm_type === 'card' ? 'var(--accent-core)' : (c.card_button_url ? 'var(--accent-green)' : 'var(--border-subtle)')};">
+                ${c.dm_type === 'card' ? '🎴 HERO CARD' : (c.card_button_url ? `🔗 BUTTON [${escapeHtml(c.card_button_text || 'Click ✅')}]` : '💬 PLAIN TEXT')}
+              </span>
+              ${c.trigger_keywords.split(',').map(k => `<span class="hud-chip">KEYWORD: ${escapeHtml(k.trim())}</span>`).join('')}
+            </div>
+
+            <div class="payload-box">
+              ${c.dm_type === 'card' ? `
+                <div style="font-weight:700; color:#fff; margin-bottom:3px;">${escapeHtml(c.card_title || c.title)}</div>
+                <div style="font-size:10px; color:var(--text-dim); margin-bottom:4px;">${escapeHtml(c.card_subtitle || '')}</div>
+                <div style="color:var(--accent-core); font-size:10px; font-weight:700;">[${escapeHtml(c.card_button_text || 'Click ✅')}] ➔ ${escapeHtml(c.card_button_url || '')}</div>
+              ` : (c.card_button_url ? `
+                <div style="color:var(--text-bright); margin-bottom:4px;">${escapeHtml(c.dm_text)}</div>
+                <div style="color:var(--accent-core); font-size:10px; font-weight:700;">[${escapeHtml(c.card_button_text || 'Click ✅')}] ➔ ${escapeHtml(c.card_button_url)}</div>
+              ` : escapeHtml(c.dm_text))}
+            </div>
+          </div>
+
+          <div class="camp-footer">
+            <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:${c.is_active ? 'var(--accent-core)' : 'var(--text-dim)'}; letter-spacing:1px; font-weight:600;">
+              STATUS: ${c.is_active ? 'ACTIVE & LISTENING' : 'STANDBY (PAUSED)'}
+            </span>
+            <button class="btn-terminate" onclick="deleteCampaign(${c.id})">TERMINATE</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     async function loadActivity() {
@@ -2161,18 +2372,51 @@
         commentPreview.textContent = val ? val : 'Sent to your DMs! Check your inbox ✨';
       }
 
-      // 2. DM Text Preview
+      // 2. Normal Mode DM Preview (Text Only OR Image 2 Native Button Bubble)
       const dmTextInput = document.getElementById('campDmText');
-      const dmPreviewBubble = document.getElementById('dmPreviewBubble');
-      if (dmTextInput && dmPreviewBubble) {
-        dmPreviewBubble.textContent = dmTextInput.value.trim() || 'Type above to see live preview...';
+      const btnUrlInput = document.getElementById('campCardBtnUrl');
+      const btnTextInput = document.getElementById('campCardBtnText');
+
+      const textBubble = document.getElementById('dmPreviewBubble');
+      const btnBubble = document.getElementById('dmPreviewButtonBubble');
+      const btnText = document.getElementById('dmPreviewButtonText');
+      const btnLabel = document.getElementById('dmPreviewButtonLabel');
+      const btnDomain = document.getElementById('previewBtnDomain');
+
+      const rawMsg = dmTextInput?.value.trim() || 'Wassup, NatBot here 🍑 ... Here\'s the link:';
+      const urlVal = btnUrlInput?.value.trim() || '';
+      const labelVal = btnTextInput?.value.trim() || 'Click ✅';
+
+      if (textBubble && btnBubble) {
+        if (urlVal) {
+          // Render Image 2 Format (Clean message bubble + Click button inside)
+          textBubble.style.display = 'none';
+          btnBubble.style.display = 'block';
+          if (btnText) btnText.textContent = rawMsg;
+          if (btnLabel) btnLabel.textContent = labelVal;
+          if (btnDomain) {
+            btnDomain.style.display = 'block';
+            try {
+              const parsed = new URL(urlVal.startsWith('http') ? urlVal : 'https://' + urlVal);
+              btnDomain.textContent = `TARGET: ${parsed.hostname}`;
+            } catch (e) {
+              btnDomain.textContent = `TARGET: ${urlVal}`;
+            }
+          }
+        } else {
+          // Render standard plain text bubble
+          textBubble.style.display = 'block';
+          btnBubble.style.display = 'none';
+          textBubble.textContent = rawMsg;
+          if (btnDomain) btnDomain.style.display = 'none';
+        }
       }
 
-      // 3. DM Button Card Preview
+      // 3. Hero Card Mode Preview
       const cardTitleInput = document.getElementById('campCardTitle');
       const cardSubtitleInput = document.getElementById('campCardSubtitle');
-      const cardBtnTextInput = document.getElementById('campCardBtnText');
-      const cardBtnUrlInput = document.getElementById('campCardBtnUrl');
+      const cardBtnTextInput = document.getElementById('campCardBtnTextHero');
+      const cardBtnUrlInput = document.getElementById('campCardBtnUrlHero');
       const cardImgInput = document.getElementById('campCardImageUrl');
 
       const cardTitle = document.getElementById('previewCardTitle');
@@ -2189,19 +2433,19 @@
         cardSubtitle.textContent = cardSubtitleInput?.value.trim() || 'Tap the button below for immediate access.';
       }
       if (cardBtn) {
-        cardBtn.textContent = cardBtnTextInput?.value.trim() || '👉 OPEN LINK';
+        cardBtn.textContent = cardBtnTextInput?.value.trim() || 'Click ✅';
       }
       if (cardDomain) {
-        const urlVal = cardBtnUrlInput?.value.trim() || '';
+        const cardUrl = cardBtnUrlInput?.value.trim() || '';
         try {
-          if (urlVal) {
-            const parsed = new URL(urlVal.startsWith('http') ? urlVal : 'https://' + urlVal);
+          if (cardUrl) {
+            const parsed = new URL(cardUrl.startsWith('http') ? cardUrl : 'https://' + cardUrl);
             cardDomain.textContent = `TARGET: ${parsed.hostname}`;
           } else {
             cardDomain.textContent = 'TARGET: yourlink.com';
           }
         } catch (e) {
-          cardDomain.textContent = `TARGET: ${urlVal || 'yourlink.com'}`;
+          cardDomain.textContent = `TARGET: ${cardUrl || 'yourlink.com'}`;
         }
       }
 
@@ -2237,18 +2481,20 @@
         mediaId: document.getElementById('campMediaId')?.value || '',
         manualMedia: document.getElementById('manualMediaInput')?.value || '',
         keywords: document.getElementById('campKeywords')?.value || '',
-        dmType: document.getElementById('campDmType')?.value || 'text',
+        dmType: document.getElementById('campDmType')?.value || 'button',
         dmText: document.getElementById('campDmText')?.value || '',
         publicReply: document.getElementById('campPublicReply')?.value || '',
+        cardBtnUrl: document.getElementById('campCardBtnUrl')?.value || '',
+        cardBtnText: document.getElementById('campCardBtnText')?.value || 'Click ✅',
         cardTitle: document.getElementById('campCardTitle')?.value || '',
         cardSubtitle: document.getElementById('campCardSubtitle')?.value || '',
-        cardBtnText: document.getElementById('campCardBtnText')?.value || '',
-        cardBtnUrl: document.getElementById('campCardBtnUrl')?.value || '',
+        cardBtnUrlHero: document.getElementById('campCardBtnUrlHero')?.value || '',
+        cardBtnTextHero: document.getElementById('campCardBtnTextHero')?.value || 'Click ✅',
         cardImageUrl: document.getElementById('campCardImageUrl')?.value || '',
         updatedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
       };
 
-      if (draft.title || draft.mediaId || draft.manualMedia || draft.keywords || draft.dmText || draft.publicReply || draft.cardBtnUrl || draft.cardTitle) {
+      if (draft.title || draft.mediaId || draft.manualMedia || draft.keywords || draft.dmText || draft.publicReply || draft.cardBtnUrl || draft.cardTitle || draft.cardBtnUrlHero) {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
         const statusEl = document.getElementById('draftStatusText');
         const dotEl = document.getElementById('draftIndicatorDot');
@@ -2280,16 +2526,19 @@
           if (mInput) mInput.value = draft.manualMedia;
         }
 
+        if (draft.cardBtnUrl) { document.getElementById('campCardBtnUrl').value = draft.cardBtnUrl; hasData = true; }
+        if (draft.cardBtnText) { document.getElementById('campCardBtnText').value = draft.cardBtnText; }
+
         if (draft.cardTitle) { document.getElementById('campCardTitle').value = draft.cardTitle; hasData = true; }
         if (draft.cardSubtitle) { document.getElementById('campCardSubtitle').value = draft.cardSubtitle; hasData = true; }
-        if (draft.cardBtnText) { document.getElementById('campCardBtnText').value = draft.cardBtnText; hasData = true; }
-        if (draft.cardBtnUrl) { document.getElementById('campCardBtnUrl').value = draft.cardBtnUrl; hasData = true; }
+        if (draft.cardBtnUrlHero) { document.getElementById('campCardBtnUrlHero').value = draft.cardBtnUrlHero; hasData = true; }
+        if (draft.cardBtnTextHero) { document.getElementById('campCardBtnTextHero').value = draft.cardBtnTextHero; }
         if (draft.cardImageUrl) { document.getElementById('campCardImageUrl').value = draft.cardImageUrl; hasData = true; }
 
         if (draft.dmType) {
           setDmType(draft.dmType);
         } else {
-          setDmType('text');
+          setDmType('button');
         }
 
         if (draft.mediaId) {
@@ -2342,7 +2591,11 @@
       localStorage.removeItem(DRAFT_KEY);
       document.getElementById('campaignForm').reset();
       clearTargetReel();
-      setDmType('text');
+      setDmType('button');
+      const btnInput = document.getElementById('campCardBtnText');
+      if (btnInput) btnInput.value = 'Click ✅';
+      const btnInputHero = document.getElementById('campCardBtnTextHero');
+      if (btnInputHero) btnInputHero.value = 'Click ✅';
       updateLivePreviews();
       const statusEl = document.getElementById('draftStatusText');
       if (statusEl) statusEl.textContent = 'DRAFT CLEARED';
@@ -2361,6 +2614,8 @@
           if (defs.keywords) document.getElementById('defKeywords').value = defs.keywords;
           if (defs.dmText) document.getElementById('defDmText').value = defs.dmText;
           if (defs.publicReply) document.getElementById('defPublicReply').value = defs.publicReply;
+          if (defs.btnUrl) document.getElementById('defBtnUrl').value = defs.btnUrl;
+          if (defs.btnText) document.getElementById('defBtnText').value = defs.btnText;
         }
       } catch (e) {}
       document.getElementById('defaultsModal').style.display = 'flex';
@@ -2378,7 +2633,9 @@
         title: document.getElementById('defTitle').value.trim(),
         keywords: document.getElementById('defKeywords').value.trim(),
         dmText: document.getElementById('defDmText').value.trim(),
-        publicReply: document.getElementById('defPublicReply').value.trim()
+        publicReply: document.getElementById('defPublicReply').value.trim(),
+        btnUrl: document.getElementById('defBtnUrl')?.value.trim() || '',
+        btnText: document.getElementById('defBtnText')?.value.trim() || 'Click ✅'
       };
       localStorage.setItem(DEFAULTS_KEY, JSON.stringify(defaults));
       closeDefaultsModal();
@@ -2398,6 +2655,20 @@
         if (defs.keywords) document.getElementById('campKeywords').value = defs.keywords;
         if (defs.dmText) document.getElementById('campDmText').value = defs.dmText;
         if (defs.publicReply) document.getElementById('campPublicReply').value = defs.publicReply;
+
+        if (defs.btnUrl) {
+          const btnUrl = document.getElementById('campCardBtnUrl');
+          if (btnUrl) btnUrl.value = defs.btnUrl;
+          const btnUrlHero = document.getElementById('campCardBtnUrlHero');
+          if (btnUrlHero) btnUrlHero.value = defs.btnUrl;
+        }
+        if (defs.btnText) {
+          const btnText = document.getElementById('campCardBtnText');
+          if (btnText) btnText.value = defs.btnText;
+          const btnTextHero = document.getElementById('campCardBtnTextHero');
+          if (btnTextHero) btnTextHero.value = defs.btnText;
+        }
+
         updateLivePreviews();
         saveDraft();
       } catch (e) {
@@ -2423,19 +2694,29 @@
       e.preventDefault();
       playSfx('deploy');
 
-      const dmType = document.getElementById('campDmType')?.value || 'text';
+      const dmType = document.getElementById('campDmType')?.value || 'button';
+      const isCard = dmType === 'card';
+
+      const buttonUrl = isCard
+        ? (document.getElementById('campCardBtnUrlHero')?.value.trim() || '')
+        : (document.getElementById('campCardBtnUrl')?.value.trim() || '');
+
+      const buttonText = isCard
+        ? (document.getElementById('campCardBtnTextHero')?.value.trim() || 'Click ✅')
+        : (document.getElementById('campCardBtnText')?.value.trim() || 'Click ✅');
+
       const payload = {
         title: document.getElementById('campTitle').value,
         mediaId: document.getElementById('campMediaId').value.trim(),
         triggerKeywords: document.getElementById('campKeywords').value,
-        dmType: dmType,
+        dmType: isCard ? 'card' : (buttonUrl ? 'button' : 'text'),
         dmText: document.getElementById('campDmText').value,
         publicReply: document.getElementById('campPublicReply').value,
-        cardTitle: document.getElementById('campCardTitle')?.value.trim() || '',
-        cardSubtitle: document.getElementById('campCardSubtitle')?.value.trim() || '',
-        cardButtonText: document.getElementById('campCardBtnText')?.value.trim() || '',
-        cardButtonUrl: document.getElementById('campCardBtnUrl')?.value.trim() || '',
-        cardImageUrl: document.getElementById('campCardImageUrl')?.value.trim() || ''
+        cardTitle: isCard ? (document.getElementById('campCardTitle')?.value.trim() || '') : null,
+        cardSubtitle: isCard ? (document.getElementById('campCardSubtitle')?.value.trim() || '') : null,
+        cardButtonText: buttonText,
+        cardButtonUrl: buttonUrl,
+        cardImageUrl: isCard ? (document.getElementById('campCardImageUrl')?.value.trim() || '') : null
       };
 
       try {
@@ -2511,7 +2792,8 @@
     // Attach real-time live preview & draft persistence listeners to form inputs
     [
       'campTitle', 'campKeywords', 'campDmText', 'campPublicReply', 'manualMediaInput',
-      'campCardTitle', 'campCardSubtitle', 'campCardBtnText', 'campCardBtnUrl', 'campCardImageUrl'
+      'campCardBtnUrl', 'campCardBtnText',
+      'campCardTitle', 'campCardSubtitle', 'campCardBtnTextHero', 'campCardBtnUrlHero', 'campCardImageUrl'
     ].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
