@@ -551,6 +551,120 @@
       border-color: #ef4444;
     }
 
+    .btn-edit-protocol {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--accent-core);
+      background: rgba(0, 240, 255, 0.08);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      padding: 5px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-edit-protocol:hover {
+      background: var(--accent-core);
+      color: #04070d;
+      border-color: var(--accent-core);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* ==========================================================================
+       CYAN THEMED PROTOCOL SCROLLBARS (FULL PAGE & CONTAINERS)
+       ========================================================================== */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-core) rgba(4, 7, 13, 0.85);
+    }
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(4, 7, 13, 0.95);
+      border-left: 1px solid rgba(0, 240, 255, 0.08);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-core);
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ffffff;
+      box-shadow: 0 0 15px var(--accent-core);
+    }
+
+    /* MOBILE RIGHT-EDGE HUD SCROLL NAVIGATOR (TOUCH-ACCESSIBLE) */
+    .hud-mobile-scroll-elevator {
+      display: none;
+      position: fixed;
+      right: 8px;
+      bottom: 24px;
+      z-index: 990;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: rgba(8, 14, 26, 0.9);
+      border: 1px solid var(--accent-core);
+      border-radius: 30px;
+      padding: 6px 4px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 14px var(--accent-glow);
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    @media (max-width: 768px) {
+      .hud-mobile-scroll-elevator {
+        display: flex;
+      }
+    }
+    .scroll-arrow-btn {
+      width: 32px;
+      height: 32px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 50%;
+      color: var(--accent-core);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .scroll-arrow-btn:active {
+      background: var(--accent-core);
+      color: #04070d;
+      transform: scale(0.92);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .scroll-indicator-track {
+      width: 4px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      position: relative;
+      margin: 4px 0;
+      overflow: hidden;
+    }
+    .scroll-indicator-thumb {
+      width: 100%;
+      height: 30%;
+      background: var(--accent-core);
+      border-radius: 2px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      box-shadow: 0 0 8px var(--accent-core);
+      transition: top 0.1s ease-out;
+    }
+
     /* ==========================================================================
        TELEMETRY STREAM LOG (PRISTINE, NO SELF-COMMENTS)
        ========================================================================== */
@@ -1564,12 +1678,13 @@
   <div class="modal-backdrop" id="campaignModal">
     <div class="modal-frame hud-frame">
       <div class="modal-title-row">
-        <div class="modal-title">INITIALIZE PROTOCOL</div>
+        <div class="modal-title" id="modalTitleText">INITIALIZE PROTOCOL</div>
         <button class="modal-close-x" onclick="closeModal()">✕</button>
       </div>
       <div class="modal-sub">CONFIGURE AUTOMATIC INSTAGRAM COMMENT-TO-DM FLOW</div>
 
       <form id="campaignForm" onsubmit="handleSaveCampaign(event)">
+        <input type="hidden" id="editingCampaignId" value="">
         <!-- Draft Auto-Saver & Default Presets Helper Bar -->
         <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0, 240, 255, 0.06); border: 1px dashed rgba(0, 240, 255, 0.25); border-radius: 6px; padding: 10px 14px; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
           <div style="display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent-core);">
@@ -1670,7 +1785,7 @@
           <div id="dmTextSection">
             <div style="margin-bottom: 12px;">
               <label style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--text-dim); display:block; margin-bottom:4px;">MESSAGE TEXT BODY</label>
-              <textarea id="campDmText" rows="3" placeholder="Wassup, NatBot here 🍑 ... Here's the link to the resource you asked for:" oninput="updateLivePreviews()"></textarea>
+              <textarea id="campDmText" rows="3" placeholder="Wassup, NatBot here ✨ ... Here's the link to the resource you asked for:" oninput="updateLivePreviews()"></textarea>
               <div class="field-hint">Follower receives a direct message in their Instagram inbox.</div>
             </div>
 
@@ -1792,7 +1907,7 @@
 
                 <!-- Image 2 Style Native Instagram Button Bubble -->
                 <div class="ig-button-dm-bubble" id="dmPreviewButtonBubble" style="display: none;">
-                  <div class="ig-button-dm-text" id="dmPreviewButtonText">Wassup, NatBot here 🍑 ... Here's the link:</div>
+                  <div class="ig-button-dm-text" id="dmPreviewButtonText">Wassup, NatBot here ✨ ... Here's the link:</div>
                   <div class="ig-button-dm-btn" id="dmPreviewButtonBtn">
                     <span id="dmPreviewButtonLabel">Click ✅</span> ↗
                   </div>
@@ -1827,10 +1942,19 @@
 
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
           <button type="button" class="stark-btn stark-btn-outline" onclick="closeModal()">CANCEL</button>
-          <button type="submit" class="stark-btn stark-btn-primary">DEPLOY PROTOCOL</button>
+          <button type="submit" class="stark-btn stark-btn-primary" id="modalSubmitBtn">DEPLOY PROTOCOL</button>
         </div>
       </form>
     </div>
+  </div>
+
+  <!-- MOBILE QUICK-SCROLL HUD ELEVATOR (CYAN THEMED) -->
+  <div class="hud-mobile-scroll-elevator" id="mobileScrollElevator">
+    <button type="button" class="scroll-arrow-btn" onclick="hudScroll('up')" title="Scroll Up">▲</button>
+    <div class="scroll-indicator-track">
+      <div class="scroll-indicator-thumb" id="scrollElevatorThumb"></div>
+    </div>
+    <button type="button" class="scroll-arrow-btn" onclick="hudScroll('down')" title="Scroll Down">▼</button>
   </div>
 
   <!-- PROTOCOL DEFAULTS CONFIGURATION MODAL -->
@@ -2077,16 +2201,17 @@
       }
     }
 
-    async function loadCampaigns() {
+    async function loadCampaigns(skipAutoRestore = false) {
       try {
         const res = await fetch('/api/campaigns');
         const campaigns = await res.json();
+        window.allCampaignsCache = Array.isArray(campaigns) ? campaigns : [];
 
         if (Array.isArray(campaigns) && campaigns.length > 0) {
           // Persist a backup snapshot in browser localStorage
           localStorage.setItem('shelly_saved_campaigns', JSON.stringify(campaigns));
-        } else if (Array.isArray(campaigns) && campaigns.length === 0) {
-          // Fallback auto-restore from browser backup if server disk was ever reset
+        } else if (Array.isArray(campaigns) && campaigns.length === 0 && !skipAutoRestore) {
+          // Fallback auto-restore from browser backup ONLY if server disk was reset (not when user deletes)
           const cached = localStorage.getItem('shelly_saved_campaigns');
           if (cached) {
             try {
@@ -2116,11 +2241,15 @@
                 const recheck = await fetch('/api/campaigns');
                 const recheckedData = await recheck.json();
                 if (recheckedData.length > 0) {
+                  window.allCampaignsCache = recheckedData;
                   return renderCampaigns(recheckedData);
                 }
               }
             } catch (err) {}
           }
+        } else if (Array.isArray(campaigns) && campaigns.length === 0) {
+          // If empty, sync localStorage so deleted campaigns never resurrect
+          localStorage.setItem('shelly_saved_campaigns', '[]');
         }
 
         renderCampaigns(campaigns);
@@ -2181,7 +2310,10 @@
             <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:${c.is_active ? 'var(--accent-core)' : 'var(--text-dim)'}; letter-spacing:1px; font-weight:600;">
               STATUS: ${c.is_active ? 'ACTIVE & LISTENING' : 'STANDBY (PAUSED)'}
             </span>
-            <button class="btn-terminate" onclick="deleteCampaign(${c.id})">TERMINATE</button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" class="btn-edit-protocol" onclick="openEditCampaignModal(${c.id})">✏ EDIT</button>
+              <button type="button" class="btn-terminate" onclick="deleteCampaign(${c.id})">TERMINATE</button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -2383,7 +2515,7 @@
       const btnLabel = document.getElementById('dmPreviewButtonLabel');
       const btnDomain = document.getElementById('previewBtnDomain');
 
-      const rawMsg = dmTextInput?.value.trim() || 'Wassup, NatBot here 🍑 ... Here\'s the link:';
+      const rawMsg = dmTextInput?.value.trim() || 'Wassup, NatBot here ✨ ... Here\'s the link:';
       const urlVal = btnUrlInput?.value.trim() || '';
       const labelVal = btnTextInput?.value.trim() || 'Click ✅';
 
@@ -2678,15 +2810,109 @@
 
     function openNewCampaignModal() {
       playSfx('click');
+      const editInput = document.getElementById('editingCampaignId');
+      if (editInput) editInput.value = '';
+      const titleEl = document.getElementById('modalTitleText');
+      if (titleEl) titleEl.textContent = 'INITIALIZE PROTOCOL';
+      const submitBtn = document.getElementById('modalSubmitBtn');
+      if (submitBtn) submitBtn.textContent = 'DEPLOY PROTOCOL';
+
       document.getElementById('campaignModal').style.display = 'flex';
       loadRecentMedia().then(() => {
         restoreDraft();
       });
     }
 
+    function openEditCampaignModal(campaignId) {
+      playSfx('click');
+      const campaign = (window.allCampaignsCache || []).find(c => c.id === campaignId || String(c.id) === String(campaignId));
+      if (!campaign) {
+        alert('Protocol not found in cache.');
+        return;
+      }
+
+      const editInput = document.getElementById('editingCampaignId');
+      if (editInput) editInput.value = campaign.id;
+
+      const titleEl = document.getElementById('modalTitleText');
+      if (titleEl) titleEl.textContent = `EDIT PROTOCOL // ${campaign.title}`;
+
+      const submitBtn = document.getElementById('modalSubmitBtn');
+      if (submitBtn) submitBtn.textContent = 'SAVE PROTOCOL CHANGES';
+
+      document.getElementById('campTitle').value = campaign.title || '';
+      document.getElementById('campKeywords').value = campaign.trigger_keywords || '';
+      document.getElementById('campPublicReply').value = campaign.public_reply || '';
+
+      const isCard = campaign.dm_type === 'card';
+      setDmType(isCard ? 'card' : 'button');
+
+      if (isCard) {
+        document.getElementById('campCardTitle').value = campaign.card_title || '';
+        document.getElementById('campCardSubtitle').value = campaign.card_subtitle || '';
+        document.getElementById('campCardBtnTextHero').value = campaign.card_button_text || 'Click ✅';
+        document.getElementById('campCardBtnUrlHero').value = campaign.card_button_url || '';
+        document.getElementById('campCardImageUrl').value = campaign.card_image_url || '';
+      } else {
+        document.getElementById('campDmText').value = campaign.dm_text || '';
+        document.getElementById('campCardBtnUrl').value = campaign.card_button_url || '';
+        document.getElementById('campCardBtnText').value = campaign.card_button_text || 'Click ✅';
+      }
+
+      // Lock on Reel ID
+      selectedMediaId = campaign.media_id || '';
+      document.getElementById('campMediaId').value = selectedMediaId;
+      const manualInput = document.getElementById('manualMediaInput');
+      if (manualInput) manualInput.value = selectedMediaId || '';
+
+      const banner = document.getElementById('lockedReelBanner');
+      const thumb = document.getElementById('lockedThumb');
+      const caption = document.getElementById('lockedCaption');
+      const idText = document.getElementById('lockedIdText');
+
+      if (selectedMediaId) {
+        const media = (recentMediaCache || []).find(m => m.id === selectedMediaId);
+        if (banner) {
+          banner.style.display = 'flex';
+          if (media) {
+            thumb.src = media.thumbnail_url || media.media_url || '';
+            caption.textContent = (media.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
+            idText.textContent = `Node ID: ${media.id}`;
+          } else {
+            thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="16" font-family="monospace" text-anchor="middle" fill="%2300f0ff">ID</text></svg>';
+            caption.textContent = `TARGET: ${selectedMediaId}`;
+            idText.textContent = 'Custom Node Locked';
+          }
+        }
+      } else {
+        if (banner) {
+          banner.style.display = 'flex';
+          thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="22" text-anchor="middle" fill="%2300f0ff">★</text></svg>';
+          caption.textContent = 'GLOBAL TARGET: ALL REELS & POSTS';
+          idText.textContent = 'Auto-reply triggers across every reel & post';
+        }
+      }
+
+      document.querySelectorAll('.media-card-item').forEach(item => {
+        if (selectedMediaId && item.getAttribute('onclick')?.includes(selectedMediaId)) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+
+      updateLivePreviews();
+      document.getElementById('campaignModal').style.display = 'flex';
+    }
+
     function closeModal() {
       playSfx('click');
-      saveDraft(); // Persist typed inputs when modal is closed!
+      const editId = document.getElementById('editingCampaignId')?.value;
+      if (!editId) {
+        saveDraft(); // Only persist draft inputs when building a new campaign
+      }
+      const editInput = document.getElementById('editingCampaignId');
+      if (editInput) editInput.value = '';
       document.getElementById('campaignModal').style.display = 'none';
     }
 
@@ -2694,6 +2920,7 @@
       e.preventDefault();
       playSfx('deploy');
 
+      const editId = document.getElementById('editingCampaignId')?.value;
       const dmType = document.getElementById('campDmType')?.value || 'button';
       const isCard = dmType === 'card';
 
@@ -2720,22 +2947,30 @@
       };
 
       try {
-        const res = await fetch('/api/campaigns', {
-          method: 'POST',
+        const endpoint = editId ? `/api/campaigns/${editId}` : '/api/campaigns';
+        const method = editId ? 'PUT' : 'POST';
+
+        const res = await fetch(endpoint, {
+          method,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+
         if (res.ok) {
-          clearDraft(false); // SUCCESS: Draft is cleared ONLY after protocol is successfully launched!
+          if (!editId) {
+            clearDraft(false); // SUCCESS: Draft is cleared ONLY after new protocol is successfully launched!
+          }
+          const editInput = document.getElementById('editingCampaignId');
+          if (editInput) editInput.value = '';
           closeModal();
           loadCampaigns();
           loadStats();
         } else {
           const err = await res.json();
-          alert('Failed to deploy protocol: ' + (err.error || 'Check required fields'));
+          alert('Failed to save protocol: ' + (err.error || 'Check required fields'));
         }
       } catch (err) {
-        alert('Error deploying protocol: ' + err.message);
+        alert('Error saving protocol: ' + err.message);
       }
     }
 
@@ -2758,13 +2993,53 @@
       playSfx('click');
       if (!confirm('Confirm termination of this protocol?')) return;
       try {
-        await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
-        loadCampaigns();
-        loadStats();
+        // Immediately remove from browser localStorage backup so auto-restore never resurrects it
+        try {
+          const cached = localStorage.getItem('shelly_saved_campaigns');
+          if (cached) {
+            let list = JSON.parse(cached);
+            if (Array.isArray(list)) {
+              list = list.filter(c => c.id !== id && String(c.id) !== String(id));
+              localStorage.setItem('shelly_saved_campaigns', JSON.stringify(list));
+            }
+          }
+        } catch (e) {}
+
+        const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          loadCampaigns(true); // true = skipAutoRestore
+          loadStats();
+        } else {
+          alert('Failed to terminate protocol.');
+        }
       } catch (err) {
         console.error('Delete error:', err);
       }
     }
+
+    /* ==========================================================================
+       MOBILE QUICK-SCROLL HUD ELEVATOR LOGIC
+       ========================================================================== */
+    function hudScroll(direction) {
+      playSfx('click');
+      const scrollAmount = window.innerHeight * 0.75;
+      window.scrollBy({
+        top: direction === 'up' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+
+    function updateScrollElevator() {
+      const thumb = document.getElementById('scrollElevatorThumb');
+      if (!thumb) return;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight <= 0) return;
+      const pct = Math.min(100, Math.max(0, (scrollTop / docHeight) * 70));
+      thumb.style.top = pct + '%';
+    }
+
+    window.addEventListener('scroll', updateScrollElevator, { passive: true });
 
     async function handleLogout() {
       playSfx('click');

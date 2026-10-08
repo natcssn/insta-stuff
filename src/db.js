@@ -238,6 +238,55 @@ function deleteCampaign(id) {
   return { success: true };
 }
 
+function updateCampaign(id, {
+  title,
+  mediaId,
+  postUrl,
+  triggerKeywords,
+  dmText,
+  publicReply,
+  dmType = 'button',
+  cardTitle = null,
+  cardSubtitle = null,
+  cardButtonText = null,
+  cardButtonUrl = null,
+  cardImageUrl = null
+}) {
+  const stmt = db.prepare(`
+    UPDATE campaigns SET
+      title = ?,
+      media_id = ?,
+      post_url = ?,
+      trigger_keywords = ?,
+      dm_text = ?,
+      public_reply = ?,
+      dm_type = ?,
+      card_title = ?,
+      card_subtitle = ?,
+      card_button_text = ?,
+      card_button_url = ?,
+      card_image_url = ?
+    WHERE id = ?
+  `);
+  stmt.run(
+    title,
+    mediaId || null,
+    postUrl || null,
+    triggerKeywords,
+    dmText,
+    publicReply || null,
+    dmType || 'button',
+    cardTitle || null,
+    cardSubtitle || null,
+    cardButtonText || null,
+    cardButtonUrl || null,
+    cardImageUrl || null,
+    id
+  );
+  saveCampaignsBackup();
+  return getCampaignById(id);
+}
+
 function getRecentComments(limit = 25) {
   return db.prepare(`
     SELECT c.*, camp.title as campaign_title 
@@ -265,6 +314,7 @@ module.exports = {
   isCommentProcessed,
   recordComment,
   createCampaign,
+  updateCampaign,
   getCampaigns,
   getCampaignById,
   findCampaignForMedia,

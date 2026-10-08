@@ -180,6 +180,54 @@ app.patch('/api/campaigns/:id/toggle', (req, res) => {
   res.json(updated);
 });
 
+// Update / Edit existing campaign
+app.put('/api/campaigns/:id', (req, res) => {
+  const { id } = req.params;
+  const {
+    title,
+    mediaId,
+    postUrl,
+    triggerKeywords,
+    dmText,
+    publicReply,
+    dmType = 'button',
+    cardTitle,
+    cardSubtitle,
+    cardButtonText,
+    cardButtonUrl,
+    cardImageUrl
+  } = req.body;
+
+  let finalDmText = (dmText || '').trim();
+  const finalBtnText = (cardButtonText || '').trim() || (cardButtonUrl ? 'Click ✅' : null);
+
+  if (!finalDmText && cardButtonUrl) {
+    finalDmText = `${cardTitle ? cardTitle + '\n\n' : ''}${cardSubtitle ? cardSubtitle + '\n\n' : ''}${finalBtnText ? finalBtnText + ': ' : ''}${cardButtonUrl}`;
+  }
+
+  if (!title || !triggerKeywords || (!finalDmText && !cardButtonUrl)) {
+    return res.status(400).json({ error: 'Title, keywords, and DM payload or button URL are required' });
+  }
+
+  const updated = db.updateCampaign(id, {
+    title,
+    mediaId: mediaId?.trim() || null,
+    postUrl: postUrl?.trim() || null,
+    triggerKeywords,
+    dmText: finalDmText || cardButtonUrl,
+    publicReply,
+    dmType,
+    cardTitle: cardTitle || null,
+    cardSubtitle: cardSubtitle || null,
+    cardButtonText: finalBtnText,
+    cardButtonUrl: cardButtonUrl?.trim() || null,
+    cardImageUrl: cardImageUrl?.trim() || null
+  });
+
+  console.log(`[Dashboard] Updated protocol ID ${id}: "${title}"`);
+  res.json(updated);
+});
+
 // Delete campaign
 app.delete('/api/campaigns/:id', (req, res) => {
   const { id } = req.params;
