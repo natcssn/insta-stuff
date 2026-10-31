@@ -124,6 +124,9 @@ async function handleCommentEvent(changeValue) {
         console.log(`✅ DM (${dmResult.format || 'text'}) successfully sent to @${username || userId}!`);
       } else {
         errorMessage = dmResult.error;
+        if (errorMessage && (errorMessage.includes('(#4)') || errorMessage.includes('(#17)') || errorMessage.includes('(#32)') || errorMessage.toLowerCase().includes('rate limit'))) {
+          queue.tripCircuitBreaker(30, errorMessage);
+        }
       }
 
       // Step B: Post public reply (if configured in campaign)

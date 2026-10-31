@@ -65,6 +65,9 @@ try {
 try {
   db.exec('ALTER TABLE campaigns ADD COLUMN card_image_url TEXT;');
 } catch (_) {}
+try {
+  db.exec('ALTER TABLE campaigns ADD COLUMN media_caption TEXT;');
+} catch (_) {}
 
 /**
  * Check if a comment has already been processed.
@@ -129,16 +132,17 @@ function restoreCampaignsFromBackup() {
       if (Array.isArray(data) && data.length > 0) {
         const insertStmt = db.prepare(`
           INSERT OR IGNORE INTO campaigns (
-            id, title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active,
+            id, title, media_id, media_caption, post_url, trigger_keywords, dm_text, public_reply, is_active,
             dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url, created_at
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
         for (const c of data) {
           insertStmt.run(
             c.id,
             c.title,
             c.media_id,
+            c.media_caption || null,
             c.post_url,
             c.trigger_keywords,
             c.dm_text,
@@ -167,6 +171,7 @@ restoreCampaignsFromBackup();
 function createCampaign({
   title,
   mediaId,
+  mediaCaption = null,
   postUrl,
   triggerKeywords,
   dmText,
@@ -180,14 +185,15 @@ function createCampaign({
 }) {
   const stmt = db.prepare(`
     INSERT INTO campaigns (
-      title, media_id, post_url, trigger_keywords, dm_text, public_reply, is_active,
+      title, media_id, media_caption, post_url, trigger_keywords, dm_text, public_reply, is_active,
       dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url
     )
-    VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
   `);
   const info = stmt.run(
     title,
     mediaId || null,
+    mediaCaption || null,
     postUrl || null,
     triggerKeywords,
     dmText,
@@ -241,6 +247,7 @@ function deleteCampaign(id) {
 function updateCampaign(id, {
   title,
   mediaId,
+  mediaCaption = null,
   postUrl,
   triggerKeywords,
   dmText,
@@ -252,10 +259,14 @@ function updateCampaign(id, {
   cardButtonUrl = null,
   cardImageUrl = null
 }) {
+  const existing = getCampaignById(id);
+  const finalMediaCaption = mediaCaption !== undefined ? mediaCaption : (existing ? existing.media_caption : null);
+
   const stmt = db.prepare(`
     UPDATE campaigns SET
       title = ?,
       media_id = ?,
+      media_caption = ?,
       post_url = ?,
       trigger_keywords = ?,
       dm_text = ?,
@@ -271,6 +282,7 @@ function updateCampaign(id, {
   stmt.run(
     title,
     mediaId || null,
+    finalMediaCaption || null,
     postUrl || null,
     triggerKeywords,
     dmText,

@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NATC INDUSTRIES // PROTOCOL SHELLY</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@500;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -1561,10 +1564,10 @@
     <!-- TOP EXECUTIVE HUD HEADER -->
     <header class="hud-frame">
       <div class="brand-group">
-        <div class="arc-reactor">
+        <div class="arc-reactor" style="position: relative; display: flex; align-items: center; justify-content: center;">
           <div class="reactor-ring-outer"></div>
           <div class="reactor-ring-inner"></div>
-          <div class="reactor-core"></div>
+          <img src="/shelly_logo.png" alt="SHELLY" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; z-index: 5; filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.7));">
         </div>
         <div class="brand-meta">
           <div class="brand-title">
@@ -2258,6 +2261,31 @@
       }
     }
 
+    function getFirstLine(text, fallback = 'Published Reel') {
+      if (!text) return fallback;
+      const lines = String(text).split(/[\r\n]+/);
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed) return trimmed;
+      }
+      return fallback;
+    }
+
+    function getCampaignTargetLabel(c) {
+      if (!c.media_id || c.media_id === 'ALL_POSTS') return 'ALL REELS & POSTS (GLOBAL)';
+      // 1. Look up in recentMediaCache
+      const found = (recentMediaCache || []).find(m => m.id === c.media_id);
+      if (found && found.caption) {
+        return `"${getFirstLine(found.caption)}"`;
+      }
+      // 2. Look up stored media_caption from DB
+      if (c.media_caption) {
+        return `"${getFirstLine(c.media_caption)}"`;
+      }
+      // 3. Fallback to ID
+      return `REEL ID // ${c.media_id}`;
+    }
+
     function renderCampaigns(campaigns) {
       const container = document.getElementById('campaigns-container');
       if (!Array.isArray(campaigns) || campaigns.length === 0) {
@@ -2279,7 +2307,7 @@
             <div class="camp-header">
               <div>
                 <div class="camp-title">${escapeHtml(c.title)}</div>
-                <div class="camp-target">TARGET REEL // ${escapeHtml(c.media_id || 'ALL_POSTS')}</div>
+                <div class="camp-target" title="Target: ${escapeHtml(c.media_id || 'Global')}">TARGET REEL // ${escapeHtml(getCampaignTargetLabel(c))}</div>
               </div>
               <label class="switch">
                 <input type="checkbox" ${c.is_active ? 'checked' : ''} onchange="toggleCampaign(${c.id}, this.checked)">
@@ -2349,6 +2377,31 @@
       }
     }
 
+    function renderRecentMediaGrid() {
+      const grid = document.getElementById('mediaPickerGrid');
+      const countSpan = document.getElementById('mediaInventoryCount');
+      if (!grid) return;
+
+      if (!Array.isArray(recentMediaCache) || recentMediaCache.length === 0) {
+        grid.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-dim); width: 100%;">No published Reels retrieved. Click "ALL REELS" above for global targeting.</div>`;
+        return;
+      }
+
+      if (countSpan) countSpan.textContent = `(${recentMediaCache.length} Videos Available)`;
+
+      grid.innerHTML = recentMediaCache.map(m => {
+        const firstLine = getFirstLine(m.caption, 'Published Reel');
+        const thumb = m.thumbnail_url || m.media_url || '';
+
+        return `
+          <div class="media-card-item ${selectedMediaId === m.id ? 'selected' : ''}" onclick="selectMediaItem('${m.id}', this)" title="${escapeHtml(firstLine)}">
+            ${thumb ? `<img src="${thumb}" class="media-thumb" alt="Reel" loading="lazy">` : `<div class="media-thumb"></div>`}
+            <div class="media-caption-hud">${escapeHtml(firstLine)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
     async function loadRecentMedia() {
       try {
         const grid = document.getElementById('mediaPickerGrid');
@@ -2356,49 +2409,69 @@
         const res = await fetch('/api/media');
         recentMediaCache = await res.json();
 
-        if (!Array.isArray(recentMediaCache) || recentMediaCache.length === 0) {
-          grid.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-dim); width: 100%;">No published Reels retrieved. Click "ALL REELS" above for global targeting.</div>`;
-          return;
+        renderRecentMediaGrid();
+
+        // If target reel is selected, ensure locked display reflects the real reel data
+        if (selectedMediaId !== null && selectedMediaId !== undefined) {
+          syncLockedReelDisplay(selectedMediaId);
         }
 
-        if (countSpan) countSpan.textContent = `(${recentMediaCache.length} Videos Available)`;
-
-        grid.innerHTML = recentMediaCache.map(m => {
-          const cleanCaption = (m.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
-          const thumb = m.thumbnail_url || m.media_url || '';
-
-          return `
-            <div class="media-card-item ${selectedMediaId === m.id ? 'selected' : ''}" onclick="selectMediaItem('${m.id}', this)">
-              ${thumb ? `<img src="${thumb}" class="media-thumb" alt="Reel" loading="lazy">` : `<div class="media-thumb"></div>`}
-              <div class="media-caption-hud">${escapeHtml(cleanCaption)}</div>
-            </div>
-          `;
-        }).join('');
-
+        // Re-render dashboard campaigns if visible so reel captions replace raw IDs
+        if (window.allCampaignsCache && window.allCampaignsCache.length > 0) {
+          renderCampaigns(window.allCampaignsCache);
+        }
       } catch (err) {
         console.warn('Could not load media inventory:', err);
       }
     }
 
-    function selectMediaItem(mediaId, el) {
-      playSfx('click');
-      document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
-      if (el) el.classList.add('selected');
-      document.getElementById('campMediaId').value = mediaId;
-      selectedMediaId = mediaId;
-
-      const media = recentMediaCache.find(m => m.id === mediaId);
+    function syncLockedReelDisplay(mediaId, fallbackCaption = null) {
       const banner = document.getElementById('lockedReelBanner');
       const thumb = document.getElementById('lockedThumb');
       const caption = document.getElementById('lockedCaption');
       const idText = document.getElementById('lockedIdText');
+      if (!banner) return;
 
-      if (media && banner) {
+      if (!mediaId || mediaId === 'ALL_POSTS') {
         banner.style.display = 'flex';
-        thumb.src = media.thumbnail_url || media.media_url || '';
-        caption.textContent = (media.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
-        idText.textContent = `Node ID: ${media.id}`;
+        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="22" text-anchor="middle" fill="%2300f0ff">★</text></svg>';
+        caption.textContent = 'GLOBAL TARGET: ALL REELS & POSTS';
+        idText.textContent = 'Auto-reply triggers across every reel & post';
+        return;
       }
+
+      banner.style.display = 'flex';
+      const media = (recentMediaCache || []).find(m => m.id === mediaId);
+
+      if (media) {
+        thumb.src = media.thumbnail_url || media.media_url || '';
+        caption.textContent = getFirstLine(media.caption, 'Published Reel');
+        idText.textContent = `Node ID: ${media.id}`;
+      } else {
+        const captionText = getFirstLine(fallbackCaption, `Target Reel // ${mediaId}`);
+        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="16" font-family="monospace" text-anchor="middle" fill="%2300f0ff">ID</text></svg>';
+        caption.textContent = captionText;
+        idText.textContent = `Node ID: ${mediaId}`;
+      }
+
+      // Highlight selected reel in carousel & scroll into view
+      document.querySelectorAll('.media-card-item').forEach(item => {
+        if (item.getAttribute('onclick')?.includes(mediaId)) {
+          item.classList.add('selected');
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+    }
+
+    function selectMediaItem(mediaId, el) {
+      playSfx('click');
+      selectedMediaId = mediaId;
+      document.getElementById('campMediaId').value = mediaId;
+      const manualInput = document.getElementById('manualMediaInput');
+      if (manualInput) manualInput.value = '';
+
+      syncLockedReelDisplay(mediaId);
       updateLivePreviews();
       saveDraft();
     }
@@ -2423,16 +2496,7 @@
       const manualInput = document.getElementById('manualMediaInput');
       if (manualInput) manualInput.value = '';
       document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
-      const banner = document.getElementById('lockedReelBanner');
-      const thumb = document.getElementById('lockedThumb');
-      const caption = document.getElementById('lockedCaption');
-      const idText = document.getElementById('lockedIdText');
-      if (banner) {
-        banner.style.display = 'flex';
-        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="22" text-anchor="middle" fill="%2300f0ff">★</text></svg>';
-        caption.textContent = 'GLOBAL TARGET: ALL REELS & POSTS';
-        idText.textContent = 'Auto-reply triggers across every reel & post';
-      }
+      syncLockedReelDisplay('');
       updateLivePreviews();
       saveDraft();
     }
@@ -2444,17 +2508,7 @@
       let val = input.value.trim();
       selectedMediaId = val;
       document.getElementById('campMediaId').value = val;
-      document.querySelectorAll('.media-card-item').forEach(item => item.classList.remove('selected'));
-      const banner = document.getElementById('lockedReelBanner');
-      const thumb = document.getElementById('lockedThumb');
-      const caption = document.getElementById('lockedCaption');
-      const idText = document.getElementById('lockedIdText');
-      if (banner) {
-        banner.style.display = 'flex';
-        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="16" font-family="monospace" text-anchor="middle" fill="%2300f0ff">ID</text></svg>';
-        caption.textContent = `TARGET: ${val}`;
-        idText.textContent = 'Custom Node / URL Locked';
-      }
+      syncLockedReelDisplay(val);
       updateLivePreviews();
       saveDraft();
     }
@@ -2818,12 +2872,18 @@
       if (submitBtn) submitBtn.textContent = 'DEPLOY PROTOCOL';
 
       document.getElementById('campaignModal').style.display = 'flex';
-      loadRecentMedia().then(() => {
+      
+      if (!Array.isArray(recentMediaCache) || recentMediaCache.length === 0) {
+        loadRecentMedia().then(() => {
+          restoreDraft();
+        });
+      } else {
+        renderRecentMediaGrid();
         restoreDraft();
-      });
+      }
     }
 
-    function openEditCampaignModal(campaignId) {
+    async function openEditCampaignModal(campaignId) {
       playSfx('click');
       const campaign = (window.allCampaignsCache || []).find(c => c.id === campaignId || String(c.id) === String(campaignId));
       if (!campaign) {
@@ -2865,44 +2925,22 @@
       const manualInput = document.getElementById('manualMediaInput');
       if (manualInput) manualInput.value = selectedMediaId || '';
 
-      const banner = document.getElementById('lockedReelBanner');
-      const thumb = document.getElementById('lockedThumb');
-      const caption = document.getElementById('lockedCaption');
-      const idText = document.getElementById('lockedIdText');
+      // Immediately display modal so the user gets instant response
+      document.getElementById('campaignModal').style.display = 'flex';
 
-      if (selectedMediaId) {
-        const media = (recentMediaCache || []).find(m => m.id === selectedMediaId);
-        if (banner) {
-          banner.style.display = 'flex';
-          if (media) {
-            thumb.src = media.thumbnail_url || media.media_url || '';
-            caption.textContent = (media.caption || 'Published Reel').replace(/[\r\n]+/g, ' ').trim();
-            idText.textContent = `Node ID: ${media.id}`;
-          } else {
-            thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="16" font-family="monospace" text-anchor="middle" fill="%2300f0ff">ID</text></svg>';
-            caption.textContent = `TARGET: ${selectedMediaId}`;
-            idText.textContent = 'Custom Node Locked';
-          }
-        }
+      // Ensure recent media inventory is loaded so user sees the normal list of reels
+      if (!Array.isArray(recentMediaCache) || recentMediaCache.length === 0) {
+        const grid = document.getElementById('mediaPickerGrid');
+        if (grid) grid.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--accent-core); width: 100%;">Connecting to Meta Media Inventory...</div>`;
+        await loadRecentMedia();
       } else {
-        if (banner) {
-          banner.style.display = 'flex';
-          thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="22" text-anchor="middle" fill="%2300f0ff">★</text></svg>';
-          caption.textContent = 'GLOBAL TARGET: ALL REELS & POSTS';
-          idText.textContent = 'Auto-reply triggers across every reel & post';
-        }
+        renderRecentMediaGrid();
       }
 
-      document.querySelectorAll('.media-card-item').forEach(item => {
-        if (selectedMediaId && item.getAttribute('onclick')?.includes(selectedMediaId)) {
-          item.classList.add('selected');
-        } else {
-          item.classList.remove('selected');
-        }
-      });
+      // Synchronize the locked target reel banner with the actual reel thumbnail & first line of caption
+      syncLockedReelDisplay(campaign.media_id, campaign.media_caption);
 
       updateLivePreviews();
-      document.getElementById('campaignModal').style.display = 'flex';
     }
 
     function closeModal() {
@@ -2932,9 +2970,15 @@
         ? (document.getElementById('campCardBtnTextHero')?.value.trim() || 'Click ✅')
         : (document.getElementById('campCardBtnText')?.value.trim() || 'Click ✅');
 
+      const targetMedia = (recentMediaCache || []).find(m => m.id === selectedMediaId);
+      const mediaCaption = targetMedia
+        ? getFirstLine(targetMedia.caption)
+        : (document.getElementById('lockedCaption')?.textContent || '');
+
       const payload = {
         title: document.getElementById('campTitle').value,
         mediaId: document.getElementById('campMediaId').value.trim(),
+        mediaCaption: mediaCaption || null,
         triggerKeywords: document.getElementById('campKeywords').value,
         dmType: isCard ? 'card' : (buttonUrl ? 'button' : 'text'),
         dmText: document.getElementById('campDmText').value,
@@ -3087,6 +3131,11 @@
     loadStats();
     loadCampaigns();
     loadActivity();
+    loadRecentMedia().then(() => {
+      if (window.allCampaignsCache && window.allCampaignsCache.length > 0) {
+        renderCampaigns(window.allCampaignsCache);
+      }
+    });
 
     // Auto telemetry polling
     setInterval(() => {

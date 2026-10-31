@@ -7,6 +7,7 @@ const config = require('./config');
 const db = require('./db');
 const bot = require('./bot');
 const instagramApi = require('./instagramApi');
+const queue = require('./messageQueue');
 
 const app = express();
 
@@ -103,6 +104,12 @@ app.get(['/dashboard', '/dashboard.html', '/index.html'], (req, res) => {
 // Serve static frontend assets (without auto-serving index.html)
 app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
+// Favicon and SHELLY brand logo routes
+app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.ico')));
+app.get('/favicon.png', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.png')));
+app.get('/shelly_logo.png', (req, res) => res.sendFile(path.join(__dirname, 'public', 'shelly_logo.png')));
+app.get('/apple-touch-icon.png', (req, res) => res.sendFile(path.join(__dirname, 'public', 'apple-touch-icon.png')));
+
 // ---------------- REST API FOR DASHBOARD UI ----------------
 app.get('/api/ping', (req, res) => {
   res.status(200).send('PONG');
@@ -114,7 +121,8 @@ app.get('/api/stats', (req, res) => {
   res.json({
     status: 'ok',
     dryRun: config.DRY_RUN,
-    stats
+    stats,
+    safety: queue.getStatus()
   });
 });
 
@@ -129,6 +137,7 @@ app.post('/api/campaigns', (req, res) => {
   const {
     title,
     mediaId,
+    mediaCaption,
     postUrl,
     triggerKeywords,
     dmText,
@@ -156,6 +165,7 @@ app.post('/api/campaigns', (req, res) => {
   const campaign = db.createCampaign({
     title,
     mediaId,
+    mediaCaption: mediaCaption?.trim() || null,
     postUrl,
     triggerKeywords,
     dmText: finalDmText || cardButtonUrl,
@@ -186,6 +196,7 @@ app.put('/api/campaigns/:id', (req, res) => {
   const {
     title,
     mediaId,
+    mediaCaption,
     postUrl,
     triggerKeywords,
     dmText,
@@ -212,6 +223,7 @@ app.put('/api/campaigns/:id', (req, res) => {
   const updated = db.updateCampaign(id, {
     title,
     mediaId: mediaId?.trim() || null,
+    mediaCaption: mediaCaption !== undefined ? (mediaCaption?.trim() || null) : undefined,
     postUrl: postUrl?.trim() || null,
     triggerKeywords,
     dmText: finalDmText || cardButtonUrl,

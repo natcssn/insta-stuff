@@ -1,5 +1,6 @@
 node_modules/
 .env
 bot_data.sqlite
+memory.json
 *.log
 cloudflared.exe
