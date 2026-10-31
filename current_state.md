@@ -191,13 +191,25 @@ To preserve Instagram account health and avoid spam detection during viral comme
 - **Desktop Parity:** Updated `C:\temp\project-jarvis` protocol panel and conversational engine to also extract and use the first line of the reel caption.
 - **Living Memory:** Created this `current_state.md` persistent tracking document.
 
-#### Phase 9 (Current): Complete Elimination of "ID" Box & Dynamic Reel Thumbnail Resolution
+#### Phase 9: Complete Elimination of "ID" Box & Dynamic Reel Thumbnail Resolution
 - **User Problem Addressed:** In the "Locked onto target reel" banner, a black box showing the text "ID" was displayed instead of the reel's thumbnail, and "TARGET REEL // (numeric ID)" appeared instead of the reel caption.
 - **"ID" Box Completely Eliminated:** Removed the hardcoded SVG text placeholder with the letters "ID". The banner now always displays the actual reel video thumbnail image. If the image is still loading or resolving, a sleek neon video play icon (`▶`) on a dark card is displayed as a fallback, NEVER the text "ID".
 - **Added `media_thumbnail_url` Column:** Added schema migration `ALTER TABLE campaigns ADD COLUMN media_thumbnail_url TEXT;` to SQLite in `src/db.js` and updated `createCampaign()` and `updateCampaign()`.
 - **Single Reel Meta Fetcher (`GET /api/media/:id`):** Added `getMediaDetails(mediaId)` in `src/instagramApi.js` and endpoint `GET /api/media/:id` in `src/server.js`. The frontend and backend can now fetch the full thumbnail and caption for ANY reel ID on demand.
 - **Server-Side Auto-Backfill:** In `GET /api/campaigns`, the server automatically detects any protocols with missing `media_caption` or `media_thumbnail_url` and backfills them asynchronously from the Meta Media inventory, permanently saving them to the database.
 - **Dashboard Card Labeling:** Protocol cards now display the exact first line of the caption (e.g. `TARGET REEL // "Made this reel a month ago 😭"`), completely eliminating raw numeric IDs from the creator's view.
+
+#### Phase 10 (Current): Live Render Protocol Audit & Meta Media Inventory Inspection
+- **Audit Performed:** Polled live Render deployment (`https://insta-stuff.onrender.com/api/campaigns`) and verified active protocols against Meta Graph API v21.0 media inventory.
+- **Render Active Protocols Found:**
+  1. Protocol `ID 10`: `LATEST_REEL_PEAK_AUTONOMY` -> Locked to Reel `18149632603558915` (Caption: `Comment "peak" guys`), triggers: `peak, link, hi`, Link Button: `Click ✅` -> `https://www.instagram.com/thenatrants/`. Status: **ACTIVE (1)**.
+  2. Protocol `ID 2`: `STARTUP_REEL_AUTONOMY` -> Locked to Reel `17906571819546262` (Caption: `Render is Peak Browskis❤️‍🔥`), triggers: `peak, hi`, Link Button: `Click ✅` -> `https://www.instagram.com/thenatrants/`. Status: **ACTIVE (1)**.
+  3. Protocol `ID 1`: `summa1` -> Locked to Reel `17906571819546262` (Caption: `Render is Peak Browskis❤️‍🔥`), triggers: `peak`, Plain text DM format. Status: **ACTIVE (1)**.
+- **Ephemeral Storage Root Cause Clarified:** On Render free-tier, cold boots/redeploys restore from Git `campaigns_backup.json`. Any protocol created solely through the browser UI that wasn't committed to `campaigns_backup.json` is not restored after a Render container rebuild. Meta Graph API stores reels, comments, and messages, but does not store automation protocols.
+- **Meta Recent Media Verified (Top 3 Reels):**
+  1. `17894947332683329` (2026-10-31): `Misconceptions Pavangal 😭🥀`
+  2. `18115057424129042` (2026-10-30): `Made this reel a month ago 😭`
+  3. `18144025210613418` (2026-10-28): `Avg Male obsession 🤩`
 
 ---
 
