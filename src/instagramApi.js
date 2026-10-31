@@ -189,6 +189,26 @@ async function getMyRecentMedia() {
 }
 
 /**
+ * Fetch a single media item (Reel or Post) by ID
+ */
+async function getMediaDetails(mediaId) {
+  if (!config.PAGE_ACCESS_TOKEN || !mediaId) return null;
+  try {
+    const url = `${BASE_URL}/${mediaId}`;
+    const res = await axios.get(url, {
+      params: {
+        fields: 'id,caption,media_type,media_product_type,permalink,thumbnail_url,media_url,timestamp',
+        access_token: config.PAGE_ACCESS_TOKEN
+      }
+    });
+    return res.data;
+  } catch (err) {
+    console.warn(`[Meta API] Could not fetch single media ${mediaId}:`, err.response?.data?.error?.message || err.message);
+    return null;
+  }
+}
+
+/**
  * Automatically subscribe the Instagram Business Account to this app's webhooks.
  */
 async function subscribeApp() {
@@ -212,6 +232,7 @@ module.exports = {
   replyToComment,
   sendPrivateReply,
   getMyRecentMedia,
+  getMediaDetails,
   subscribeApp
 };
 

@@ -68,6 +68,9 @@ try {
 try {
   db.exec('ALTER TABLE campaigns ADD COLUMN media_caption TEXT;');
 } catch (_) {}
+try {
+  db.exec('ALTER TABLE campaigns ADD COLUMN media_thumbnail_url TEXT;');
+} catch (_) {}
 
 /**
  * Check if a comment has already been processed.
@@ -132,10 +135,10 @@ function restoreCampaignsFromBackup() {
       if (Array.isArray(data) && data.length > 0) {
         const insertStmt = db.prepare(`
           INSERT OR IGNORE INTO campaigns (
-            id, title, media_id, media_caption, post_url, trigger_keywords, dm_text, public_reply, is_active,
+            id, title, media_id, media_caption, media_thumbnail_url, post_url, trigger_keywords, dm_text, public_reply, is_active,
             dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url, created_at
           )
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `);
         for (const c of data) {
           insertStmt.run(
@@ -143,6 +146,7 @@ function restoreCampaignsFromBackup() {
             c.title,
             c.media_id,
             c.media_caption || null,
+            c.media_thumbnail_url || null,
             c.post_url,
             c.trigger_keywords,
             c.dm_text,
@@ -172,6 +176,7 @@ function createCampaign({
   title,
   mediaId,
   mediaCaption = null,
+  mediaThumbnailUrl = null,
   postUrl,
   triggerKeywords,
   dmText,
@@ -185,15 +190,16 @@ function createCampaign({
 }) {
   const stmt = db.prepare(`
     INSERT INTO campaigns (
-      title, media_id, media_caption, post_url, trigger_keywords, dm_text, public_reply, is_active,
+      title, media_id, media_caption, media_thumbnail_url, post_url, trigger_keywords, dm_text, public_reply, is_active,
       dm_type, card_title, card_subtitle, card_button_text, card_button_url, card_image_url
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
   `);
   const info = stmt.run(
     title,
     mediaId || null,
     mediaCaption || null,
+    mediaThumbnailUrl || null,
     postUrl || null,
     triggerKeywords,
     dmText,
@@ -248,6 +254,7 @@ function updateCampaign(id, {
   title,
   mediaId,
   mediaCaption = null,
+  mediaThumbnailUrl = null,
   postUrl,
   triggerKeywords,
   dmText,
@@ -261,12 +268,14 @@ function updateCampaign(id, {
 }) {
   const existing = getCampaignById(id);
   const finalMediaCaption = mediaCaption !== undefined ? mediaCaption : (existing ? existing.media_caption : null);
+  const finalMediaThumb = mediaThumbnailUrl !== undefined ? mediaThumbnailUrl : (existing ? existing.media_thumbnail_url : null);
 
   const stmt = db.prepare(`
     UPDATE campaigns SET
       title = ?,
       media_id = ?,
       media_caption = ?,
+      media_thumbnail_url = ?,
       post_url = ?,
       trigger_keywords = ?,
       dm_text = ?,
@@ -283,6 +292,7 @@ function updateCampaign(id, {
     title,
     mediaId || null,
     finalMediaCaption || null,
+    finalMediaThumb || null,
     postUrl || null,
     triggerKeywords,
     dmText,
@@ -297,6 +307,17 @@ function updateCampaign(id, {
   );
   saveCampaignsBackup();
   return getCampaignById(id);
+}
+
+function updateCampaignMediaMeta(id, { mediaCaption, mediaThumbnailUrl }) {
+  const stmt = db.prepare(`
+    UPDATE campaigns SET
+      media_caption = COALESCE(?, media_caption),
+      media_thumbnail_url = COALESCE(?, media_thumbnail_url)
+    WHERE id = ?
+  `);
+  stmt.run(mediaCaption || null, mediaThumbnailUrl || null, id);
+  saveCampaignsBackup();
 }
 
 function getRecentComments(limit = 25) {
@@ -327,6 +348,7 @@ module.exports = {
   recordComment,
   createCampaign,
   updateCampaign,
+  updateCampaignMediaMeta,
   getCampaigns,
   getCampaignById,
   findCampaignForMedia,

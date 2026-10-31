@@ -1722,7 +1722,7 @@
 
           <!-- Locked Banner (When a reel is picked) -->
           <div id="lockedReelBanner" style="display: none; align-items: center; gap: 12px; background: rgba(0, 240, 255, 0.12); border: 1px solid var(--accent-core); border-radius: 6px; padding: 10px; margin-bottom: 12px;">
-            <img id="lockedThumb" src="" style="width: 38px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--accent-core);">
+            <img id="lockedThumb" src="" alt="Target Reel" style="width: 38px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--accent-core); background: #04070d;" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'38\' height=\'50\' viewBox=\'0 0 38 50\'><rect width=\'38\' height=\'50\' fill=\'%2304070d\'/><polygon points=\'14,17 28,25 14,33\' fill=\'%2300f0ff\'/></svg>'">
             <div style="flex: 1; min-width: 0;">
               <div style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--accent-core); font-weight:700;">✓ LOCKED ONTO TARGET REEL</div>
               <div id="lockedCaption" style="font-size:11px; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:2px;"></div>
@@ -2282,8 +2282,8 @@
       if (c.media_caption) {
         return `"${getFirstLine(c.media_caption)}"`;
       }
-      // 3. Fallback to ID
-      return `REEL ID // ${c.media_id}`;
+      // 3. Fallback
+      return '"Target Reel"';
     }
 
     function renderCampaigns(campaigns) {
@@ -2425,7 +2425,7 @@
       }
     }
 
-    function syncLockedReelDisplay(mediaId, fallbackCaption = null) {
+    function syncLockedReelDisplay(mediaId, fallbackCaption = null, fallbackThumb = null) {
       const banner = document.getElementById('lockedReelBanner');
       const thumb = document.getElementById('lockedThumb');
       const caption = document.getElementById('lockedCaption');
@@ -2443,15 +2443,43 @@
       banner.style.display = 'flex';
       const media = (recentMediaCache || []).find(m => m.id === mediaId);
 
-      if (media) {
-        thumb.src = media.thumbnail_url || media.media_url || '';
-        caption.textContent = getFirstLine(media.caption, 'Published Reel');
-        idText.textContent = `Node ID: ${media.id}`;
+      const resolvedThumb = (media && (media.thumbnail_url || media.media_url)) || fallbackThumb || '';
+      const resolvedCaption = getFirstLine(media ? media.caption : fallbackCaption, '');
+
+      if (resolvedThumb) {
+        thumb.src = resolvedThumb;
       } else {
-        const captionText = getFirstLine(fallbackCaption, `Target Reel // ${mediaId}`);
-        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><text x="19" y="32" font-size="16" font-family="monospace" text-anchor="middle" fill="%2300f0ff">ID</text></svg>';
-        caption.textContent = captionText;
-        idText.textContent = `Node ID: ${mediaId}`;
+        thumb.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="38" height="50" viewBox="0 0 38 50"><rect width="38" height="50" fill="%2304070d"/><polygon points="14,17 28,25 14,33" fill="%2300f0ff"/></svg>';
+      }
+
+      caption.textContent = resolvedCaption || 'Target Reel';
+      idText.textContent = `Node ID: ${mediaId}`;
+
+      // If we don't have the media object or full thumbnail, query /api/media/:id to fetch real thumbnail & caption
+      if ((!media || !resolvedThumb || !resolvedCaption) && mediaId) {
+        fetch(`/api/media/${mediaId}`)
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data && selectedMediaId === mediaId) {
+              const fetchedThumb = data.thumbnail_url || data.media_url;
+              if (fetchedThumb) {
+                thumb.src = fetchedThumb;
+              }
+              if (data.caption) {
+                caption.textContent = getFirstLine(data.caption);
+              }
+              // Add to cache
+              if (Array.isArray(recentMediaCache) && !recentMediaCache.some(m => m.id === data.id)) {
+                recentMediaCache.push(data);
+                renderRecentMediaGrid();
+              }
+              // Re-render dashboard cards so they update too
+              if (window.allCampaignsCache && window.allCampaignsCache.length > 0) {
+                renderCampaigns(window.allCampaignsCache);
+              }
+            }
+          })
+          .catch(() => {});
       }
 
       // Highlight selected reel in carousel & scroll into view
@@ -2471,7 +2499,11 @@
       const manualInput = document.getElementById('manualMediaInput');
       if (manualInput) manualInput.value = '';
 
-      syncLockedReelDisplay(mediaId);
+      const media = (recentMediaCache || []).find(m => m.id === mediaId);
+      const thumbUrl = media ? (media.thumbnail_url || media.media_url) : null;
+      const captionText = media ? media.caption : null;
+
+      syncLockedReelDisplay(mediaId, captionText, thumbUrl);
       updateLivePreviews();
       saveDraft();
     }
@@ -2938,7 +2970,7 @@
       }
 
       // Synchronize the locked target reel banner with the actual reel thumbnail & first line of caption
-      syncLockedReelDisplay(campaign.media_id, campaign.media_caption);
+      syncLockedReelDisplay(campaign.media_id, campaign.media_caption, campaign.media_thumbnail_url);
 
       updateLivePreviews();
     }
@@ -2974,11 +3006,15 @@
       const mediaCaption = targetMedia
         ? getFirstLine(targetMedia.caption)
         : (document.getElementById('lockedCaption')?.textContent || '');
+      const mediaThumb = targetMedia
+        ? (targetMedia.thumbnail_url || targetMedia.media_url || '')
+        : (document.getElementById('lockedThumb')?.src || '');
 
       const payload = {
         title: document.getElementById('campTitle').value,
         mediaId: document.getElementById('campMediaId').value.trim(),
         mediaCaption: mediaCaption || null,
+        mediaThumbnailUrl: mediaThumb && !mediaThumb.startsWith('data:') ? mediaThumb : null,
         triggerKeywords: document.getElementById('campKeywords').value,
         dmType: isCard ? 'card' : (buttonUrl ? 'button' : 'text'),
         dmText: document.getElementById('campDmText').value,

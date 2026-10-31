@@ -191,6 +191,14 @@ To preserve Instagram account health and avoid spam detection during viral comme
 - **Desktop Parity:** Updated `C:\temp\project-jarvis` protocol panel and conversational engine to also extract and use the first line of the reel caption.
 - **Living Memory:** Created this `current_state.md` persistent tracking document.
 
+#### Phase 9 (Current): Complete Elimination of "ID" Box & Dynamic Reel Thumbnail Resolution
+- **User Problem Addressed:** In the "Locked onto target reel" banner, a black box showing the text "ID" was displayed instead of the reel's thumbnail, and "TARGET REEL // (numeric ID)" appeared instead of the reel caption.
+- **"ID" Box Completely Eliminated:** Removed the hardcoded SVG text placeholder with the letters "ID". The banner now always displays the actual reel video thumbnail image. If the image is still loading or resolving, a sleek neon video play icon (`▶`) on a dark card is displayed as a fallback, NEVER the text "ID".
+- **Added `media_thumbnail_url` Column:** Added schema migration `ALTER TABLE campaigns ADD COLUMN media_thumbnail_url TEXT;` to SQLite in `src/db.js` and updated `createCampaign()` and `updateCampaign()`.
+- **Single Reel Meta Fetcher (`GET /api/media/:id`):** Added `getMediaDetails(mediaId)` in `src/instagramApi.js` and endpoint `GET /api/media/:id` in `src/server.js`. The frontend and backend can now fetch the full thumbnail and caption for ANY reel ID on demand.
+- **Server-Side Auto-Backfill:** In `GET /api/campaigns`, the server automatically detects any protocols with missing `media_caption` or `media_thumbnail_url` and backfills them asynchronously from the Meta Media inventory, permanently saving them to the database.
+- **Dashboard Card Labeling:** Protocol cards now display the exact first line of the caption (e.g. `TARGET REEL // "Made this reel a month ago 😭"`), completely eliminating raw numeric IDs from the creator's view.
+
 ---
 
 ### 8. Direct Instructions for Future Prompts

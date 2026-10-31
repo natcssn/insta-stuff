@@ -129,6 +129,29 @@ app.get('/api/stats', (req, res) => {
 // Get all video campaigns
 app.get('/api/campaigns', (req, res) => {
   const campaigns = db.getCampaigns();
+
+  // Asynchronously backfill missing reel captions/thumbnails in background
+  const needsBackfill = campaigns.filter(c => c.media_id && c.media_id !== 'ALL_POSTS' && (!c.media_caption || !c.media_thumbnail_url));
+  if (needsBackfill.length > 0) {
+    instagramApi.getMyRecentMedia().then(mediaList => {
+      if (Array.isArray(mediaList) && mediaList.length > 0) {
+        for (const camp of needsBackfill) {
+          const match = mediaList.find(m => m.id === camp.media_id);
+          if (match) {
+            const firstLine = (match.caption || '').split(/[\r\n]+/)[0].trim() || 'Published Reel';
+            const thumb = match.thumbnail_url || match.media_url || null;
+            db.updateCampaignMediaMeta(camp.id, {
+              mediaCaption: firstLine,
+              mediaThumbnailUrl: thumb
+            });
+            camp.media_caption = firstLine;
+            camp.media_thumbnail_url = thumb;
+          }
+        }
+      }
+    }).catch(() => {});
+  }
+
   res.json(campaigns);
 });
 
@@ -138,6 +161,7 @@ app.post('/api/campaigns', (req, res) => {
     title,
     mediaId,
     mediaCaption,
+    mediaThumbnailUrl,
     postUrl,
     triggerKeywords,
     dmText,
@@ -166,6 +190,7 @@ app.post('/api/campaigns', (req, res) => {
     title,
     mediaId,
     mediaCaption: mediaCaption?.trim() || null,
+    mediaThumbnailUrl: mediaThumbnailUrl?.trim() || null,
     postUrl,
     triggerKeywords,
     dmText: finalDmText || cardButtonUrl,
@@ -197,6 +222,7 @@ app.put('/api/campaigns/:id', (req, res) => {
     title,
     mediaId,
     mediaCaption,
+    mediaThumbnailUrl,
     postUrl,
     triggerKeywords,
     dmText,
@@ -224,6 +250,7 @@ app.put('/api/campaigns/:id', (req, res) => {
     title,
     mediaId: mediaId?.trim() || null,
     mediaCaption: mediaCaption !== undefined ? (mediaCaption?.trim() || null) : undefined,
+    mediaThumbnailUrl: mediaThumbnailUrl !== undefined ? (mediaThumbnailUrl?.trim() || null) : undefined,
     postUrl: postUrl?.trim() || null,
     triggerKeywords,
     dmText: finalDmText || cardButtonUrl,
@@ -257,6 +284,20 @@ app.get('/api/comments', (req, res) => {
 app.get('/api/media', async (req, res) => {
   const media = await instagramApi.getMyRecentMedia();
   res.json(media);
+});
+
+// Get single reel/post details by ID
+app.get('/api/media/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const details = await instagramApi.getMediaDetails(id);
+    if (!details) {
+      return res.status(404).json({ error: 'Media not found' });
+    }
+    res.json(details);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch media details' });
+  }
 });
 
 // ---------------- META WEBHOOK ENDPOINTS ----------------
