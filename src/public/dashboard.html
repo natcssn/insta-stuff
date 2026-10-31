@@ -2601,7 +2601,11 @@
       const btnLabel = document.getElementById('dmPreviewButtonLabel');
       const btnDomain = document.getElementById('previewBtnDomain');
 
-      const rawMsg = dmTextInput?.value.trim() || 'Wassup, NatBot here ✨ ... Here\'s the link:';
+      const rawMsg = dmTextInput?.value.trim() || "Wassup, NatBot here ✨ ... Here's the link:";
+      const cleanPreviewMsg = rawMsg
+        .replace(/(?:click\s*✅?|link|here):\s*https?:\/\/\S+/gi, '')
+        .replace(/https?:\/\/\S+/gi, '')
+        .trim() || 'Here is your link! 🚀';
       const urlVal = btnUrlInput?.value.trim() || '';
       const labelVal = btnTextInput?.value.trim() || 'Click ✅';
 
@@ -2610,7 +2614,7 @@
           // Render Image 2 Format (Clean message bubble + Click button inside)
           textBubble.style.display = 'none';
           btnBubble.style.display = 'block';
-          if (btnText) btnText.textContent = rawMsg;
+          if (btnText) btnText.textContent = cleanPreviewMsg;
           if (btnLabel) btnLabel.textContent = labelVal;
           if (btnDomain) {
             btnDomain.style.display = 'block';

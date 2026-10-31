@@ -174,12 +174,12 @@ app.post('/api/campaigns', (req, res) => {
     cardImageUrl
   } = req.body;
 
-  // Ensure fallback dmText exists if card or button mode is used
+  // Ensure fallback dmText exists if card or button mode is used without polluting text with raw URLs
   let finalDmText = (dmText || '').trim();
   const finalBtnText = (cardButtonText || '').trim() || (cardButtonUrl ? 'Click ✅' : null);
 
-  if (!finalDmText && cardButtonUrl) {
-    finalDmText = `${cardTitle ? cardTitle + '\n\n' : ''}${cardSubtitle ? cardSubtitle + '\n\n' : ''}${finalBtnText ? finalBtnText + ': ' : ''}${cardButtonUrl}`;
+  if (!finalDmText) {
+    finalDmText = (cardTitle || cardSubtitle || 'Here is your link! 🚀').trim();
   }
 
   if (!title || !triggerKeywords || (!finalDmText && !cardButtonUrl)) {
@@ -193,7 +193,7 @@ app.post('/api/campaigns', (req, res) => {
     mediaThumbnailUrl: mediaThumbnailUrl?.trim() || null,
     postUrl,
     triggerKeywords,
-    dmText: finalDmText || cardButtonUrl,
+    dmText: finalDmText,
     publicReply,
     dmType,
     cardTitle: cardTitle || null,
@@ -238,8 +238,8 @@ app.put('/api/campaigns/:id', (req, res) => {
   let finalDmText = (dmText || '').trim();
   const finalBtnText = (cardButtonText || '').trim() || (cardButtonUrl ? 'Click ✅' : null);
 
-  if (!finalDmText && cardButtonUrl) {
-    finalDmText = `${cardTitle ? cardTitle + '\n\n' : ''}${cardSubtitle ? cardSubtitle + '\n\n' : ''}${finalBtnText ? finalBtnText + ': ' : ''}${cardButtonUrl}`;
+  if (!finalDmText) {
+    finalDmText = (cardTitle || cardSubtitle || 'Here is your link! 🚀').trim();
   }
 
   if (!title || !triggerKeywords || (!finalDmText && !cardButtonUrl)) {
@@ -253,7 +253,7 @@ app.put('/api/campaigns/:id', (req, res) => {
     mediaThumbnailUrl: mediaThumbnailUrl !== undefined ? (mediaThumbnailUrl?.trim() || null) : undefined,
     postUrl: postUrl?.trim() || null,
     triggerKeywords,
-    dmText: finalDmText || cardButtonUrl,
+    dmText: finalDmText,
     publicReply,
     dmType,
     cardTitle: cardTitle || null,

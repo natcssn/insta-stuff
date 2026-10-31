@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "Pixel pet",
+    "media_id": "18115057424129042",
+    "media_caption": "Made this reel a month ago 😭",
+    "media_thumbnail_url": "https://instagram.fmaa3-3.fna.fbcdn.net/v/t15.5256-10/881733539_2146126486111270_5196340424626397076_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=101&_nc_map=urlgen_bucketless&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=qBURIkYKioMQ7kNvwHC1f9O&_nc_oc=AdoU8FwNxFpFPcftZ_PdrqDz0fQnFKoQcmOGi9hffVLcUjODOtIaBdewjf60BuALqNs&_nc_zt=23&_nc_ht=instagram.fmaa3-3.fna&edm=ANQ71j8EAAAA&_nc_gid=4PDY1jVzLzSOytoYMxyCRA&_nc_tpa=Q5bMBQKo6UwFo48fL9dyhhPXlLyHr67A1BF9Q7zV27lUGH55x3-mESR_EkChBU3VXshLNJ6cP6YDBagoOA&oh=00_AQTiOVWpd3vpttSYHaVdWsvlfkfG252mpA7w1DRO0xUuWQ&oe=6AEB8618",
+    "post_url": "https://www.instagram.com/reel/DfHDcVpTgnc/",
+    "trigger_keywords": "pet",
+    "dm_text": "Hiiyaaa here's your well deserved pet 🦁",
+    "public_reply": "Thanks for commenting 😍...check your dm✌️",
+    "is_active": 1,
+    "created_at": "2026-10-31 00:00:00",
+    "dm_type": "button",
+    "card_title": "Hiiyaaa here's your well deserved pet 🦁",
+    "card_subtitle": "Tap the button below to download 👇",
+    "card_button_text": "Click ✅",
+    "card_button_url": "https://pixelpet.ezfoodz.tech/download",
+    "card_image_url": null
+  }
+]

@@ -108,7 +108,7 @@ async function handleCommentEvent(changeValue) {
         subtitle: campaign.card_subtitle || null,
         buttonText: campaign.card_button_text || 'Click ✅',
         buttonUrl: campaign.card_button_url,
-        imageUrl: campaign.dm_type === 'card' ? campaign.card_image_url : null
+        imageUrl: campaign.dm_type === 'card' ? (campaign.card_image_url || campaign.media_thumbnail_url || null) : null
       } : null;
 
       console.log(`🚀 Dispatching ${cardConfig ? (cardConfig.imageUrl ? 'Image Card' : 'Link Button') : 'Text'} DM to @${username || userId} for campaign "${campaign.title}"...`);

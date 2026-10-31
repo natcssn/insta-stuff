@@ -1,229 +1,143 @@
-# S.H.E.L.L.Y — INSTAGRAM AUTONOMOUS PROTOCOL ENGINE
-## Comprehensive System State & Project Living Memory
-
-> **CRITICAL PROTOCOL FOR AI ASSISTANTS:**
-> This document is the single source of truth for the S.H.E.L.L.Y Instagram automation codebase.
-> **You MUST update this file after EVERY single prompt and code modification**, documenting what was added, modified, or removed, and updating the current state so context is never lost across conversation boundaries.
+# S.H.E.L.L.Y — MARK-VII TACTICAL COCKPIT & INSTAGRAM AUTONOMOUS PROTOCOL ENGINE
+## Comprehensive System State & Living Project Memory
+**Last Updated:** November 1, 2026 (Phase 15: Discord/Antigravity Taskbar Liberation, Groq Whisper Turbo <0.35s STT, Qwen 3.8 27B Instant Brain, & Leaky-Integrator VAD)  
+**Operator / Creator (Boss):** NatC (1K+ Instagram followers)  
+**Primary AI Assistant:** S.H.E.L.L.Y (Smart Heuristic Execution & Low-Latency Listening Yield — Mark-VII Cockpit)  
+**Strict Project Directives:**  
+1. **NO GIT PUSH:** Zero commits or pushes to remote GitHub without explicit verbal command from NatC.
+2. **RENDER WEB KEEP-ALIVE:** Keep the cloud-hosted web auto-reply service 100% stable and operational.
+3. **MANDATORY LIVING MEMORY UPDATES:** Every single agent turn must update this `current_state.md` file so context is never lost across conversation windows.
 
 ---
 
-### 1. Project Overview & Architecture
-
-S.H.E.L.L.Y (Smart Heuristic Execution & Low-Latency Listening Yield) is an autonomous Instagram comment-to-DM automation system designed for creator content monetization, resource delivery, and community engagement.
-
-The project currently operates across two harmonized branches:
+### 1. High-Level Vision & Two-Branch Architecture
 
 ```
                                ┌────────────────────────────────────────────────────────┐
                                │           S.H.E.L.L.Y DUAL-BRANCH ARCHITECTURE         │
+                               │                    OPERATOR: NatC                      │
                                └───────────────────────────┬────────────────────────────┘
                                                            │
                         ┌──────────────────────────────────┴──────────────────────────────────┐
                         ▼                                                                     ▼
      ┌─────────────────────────────────────────┐                           ┌─────────────────────────────────────────┐
-     │           WEB SAAS BRANCH               │                           │          PC SOFTWARE BRANCH             │
-     │  Location: c:\natuse_imp\               │                           │  Location: C:\temp\project-jarvis\      │
-     │            insta_auto_reply_shii        │                           │  Role: Local Desktop Mission Control    │
-     │  Role: Primary Server & Webhook Node    │                           │  Engine: Python + CustomTkinter + TTS   │
-     │  Hosting: Render Cloud (24/7 Live)      │                           │  Control: Conversational Voice + Gemini │
-     │  URL: https://insta-stuff.onrender.com  │                           │  Bridge: InstagramBridge API Connector  │
+     │           WEB SAAS BRANCH               │                           │     PC DESKTOP TACTICAL COCKPIT         │
+     │  Location: c:\natuse_imp\               │                           │  Location: C:\temp\PROJECT-SHELLY\      │
+     │            insta_auto_reply_shii        │                           │  Binary: SHELLY.exe (Native Win32 PE)   │
+     │  Role: Primary Server & Webhook Node    │                           │  Engine: Webview2 (Chromium GPU/CPU)    │
+     │  Hosting: Render Cloud (24/7 Live)      │◄─────── REST Bridge ──────┤  Audio: Continuous 16kHz PyAudio VAD    │
+     │  URL: https://insta-stuff.onrender.com  │    (instagram_bridge.py)  │  Voice: Edge Neural Ava (Human Voice)   │
+     │  Security: 2.5s-6.5s Jitter & Quotas    │                           │  Hardware: Hybrid GPU/CPU Auto-Profiler │
      └─────────────────────────────────────────┘                           └─────────────────────────────────────────┘
 ```
 
 ---
 
-### 2. Tech Stack & Infrastructure
+### 2. Branch 1: Web Auto-Reply Service (`c:\natuse_imp\insta_auto_reply_shii`)
 
-| Component | Technology | Description |
-| :--- | :--- | :--- |
-| **Backend Runtime** | Node.js (v18+) & Express | High-concurrency REST API and Meta Webhook consumer |
-| **Database** | SQLite via `better-sqlite3` | Zero-latency local storage with ACID compliance |
-| **Persistent Backup** | `campaigns_backup.json` | JSON snapshot sync to prevent data loss across cloud restarts |
-| **Frontend UI** | HTML5, Vanilla JavaScript, CSS3 | Stark/Jarvis Cyberdeck HUD with Web Audio SFX & 2D Canvas |
-| **Meta Graph API** | Graph API v21.0 | Webhooks for comments, messages, and published media inventory |
-| **Cloud Deployment** | Render | Automatic GitHub deployment from branch `main` |
-| **PC Desktop Deck** | Python 3.13, CustomTkinter, Edge-TTS | Holographic local cockpit with live voice recognition & Gemini |
+#### Tech Stack & Core Configuration
+* **Runtime:** Node.js (v18+) with Express.
+* **Database:** SQLite (`bot_data.sqlite`) using `better-sqlite3` (ACID-compliant, synchronous).
+* **Cloud Node:** Render (`https://insta-stuff.onrender.com`) with automated keep-alive ping cycles.
+* **Security & Anti-Ban Safeguards (`src/messageQueue.js`):**
+  * **Humanized Jitter:** Randomized delay between **2500ms and 6500ms** to avoid bot detection patterns.
+  * **Hourly Quota Guard:** 60 DMs/hour maximum.
+  * **Daily Quota Guard:** 300 DMs/day maximum.
+  * **Circuit Breaker:** Auto-pauses queue dispatch upon Meta HTTP 429 / rate-limiting signals.
 
----
-
-### 3. Database Schema (`bot_data.sqlite`)
-
-The database consists of two primary tables with automated schema migrations on startup:
-
-#### A. `campaigns` Table (Automation Protocols)
-| Column | Type | Default | Purpose |
-| :--- | :--- | :--- | :--- |
-| `id` | `INTEGER PRIMARY KEY AUTOINCREMENT` | — | Unique Protocol ID |
-| `title` | `TEXT NOT NULL` | — | Codename of the campaign (e.g. `PEAK_REEL_AUTONOMY`) |
-| `media_id` | `TEXT` | `NULL` | Instagram Media/Reel ID. If `NULL` or `'ALL_POSTS'`, triggers globally |
-| `media_caption` | `TEXT` | `NULL` | First line of the target Reel's caption for instant display |
-| `post_url` | `TEXT` | `NULL` | Instagram Reel permalink |
-| `trigger_keywords` | `TEXT NOT NULL` | — | Comma-separated triggers (case-insensitive, e.g. `peak, link, hi`) |
-| `dm_text` | `TEXT NOT NULL` | — | Main text body of the private message |
-| `public_reply` | `TEXT` | `NULL` | Optional public comment reply (e.g. `Sent to your DMs! Check inbox ✨`) |
-| `dm_type` | `TEXT` | `'button'` | Protocol format: `'button'` (Image 2 style) or `'card'` (Image 1 style) |
-| `card_title` | `TEXT` | `NULL` | Title for Hero Card mode (up to 80 chars) |
-| `card_subtitle` | `TEXT` | `NULL` | Subtitle for Hero Card mode (up to 80 chars) |
-| `card_button_text` | `TEXT` | `'Click ✅'` | Text displayed inside the clickable link button |
-| `card_button_url` | `TEXT` | `NULL` | Target destination link (e.g. `https://yourlink.com`) |
-| `card_image_url` | `TEXT` | `NULL` | Custom banner image for Hero Card mode |
-| `is_active` | `INTEGER` | `1` | `1` = Active & Listening; `0` = Standby / Paused |
-| `created_at` | `DATETIME` | `CURRENT_TIMESTAMP` | Timestamp of protocol deployment |
-
-#### B. `processed_comments` Table (Telemetry & Deduplication)
-| Column | Type | Purpose |
-| :--- | :--- | :--- |
-| `comment_id` | `TEXT PRIMARY KEY` | Meta comment ID (strictly guarantees 1 response per comment) |
-| `user_id` | `TEXT` | Instagram scoped user ID of the commenter |
-| `username` | `TEXT` | Commenter's Instagram handle |
-| `comment_text` | `TEXT` | Exact text content posted by the user |
-| `media_id` | `TEXT` | ID of the post or reel where the comment occurred |
-| `campaign_id` | `INTEGER` | Linked protocol ID that matched the trigger |
-| `public_reply_sent` | `INTEGER` | `1` if public comment reply was posted, `0` otherwise |
-| `dm_sent` | `INTEGER` | `1` if private DM was successfully dispatched |
-| `status` | `TEXT` | Execution state: `SUCCESS`, `SKIPPED`, `RATE_LIMITED`, `ERROR` |
-| `error_message` | `TEXT` | Diagnostic error details if Meta API rejected the call |
-| `processed_at` | `DATETIME` | Timestamp of telemetry logging |
+#### Production Updates Integrated (NatC Commits `0a4e586` & `ad46adb`):
+* **Real Reel Thumbnail & Caption:** Completely purged the legacy "ID" text box; locked protocol banner and dashboard cards now display the actual reel video thumbnail image and first-line caption.
+* **Single Reel Meta Fetcher (`GET /api/media/:id`):** Real-time thumbnail and caption resolution on demand.
+* **Protocol Edit Mode:** Real-time editing and synchronization of active protocols.
+* **Purged Legacy Test Protocols:** Render cloud, local database, and `campaigns_backup.json` cleaned of stale test protocols (`summa1`, `STARTUP_REEL_AUTONOMY`, `LATEST_REEL_PEAK_AUTONOMY`).
+* **Active Meta Reel Inventory:**
+  1. `17894947332683329`: `Misconceptions Pavangal 😭🥀`
+  2. `18115057424129042`: `Made this reel a month ago 😭`
+  3. `18144025210613418`: `Avg Male obsession 🤩`
 
 ---
 
-### 4. API Endpoints Reference
+### 3. Branch 2: Brand-New PC Tactical Cockpit (`C:\temp\PROJECT-SHELLY`)
 
-| Method | Endpoint | Auth Required | Purpose |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/ping` | No | Self-ping keepalive & health check |
-| `POST` | `/api/auth/login` | No | Authenticates admin credentials, issues JWT |
-| `POST` | `/api/auth/logout` | No | Clears session cookie |
-| `GET` | `/api/auth/check` | Yes | Verifies active session clearance |
-| `GET` | `/api/stats` | Yes | Telemetry summary: active campaigns, DMs sent, safety quotas |
-| `GET` | `/api/media` | Yes | Fetches recent reels/posts from Meta Graph API |
-| `GET` | `/api/campaigns` | Yes | Returns all configured protocols |
-| `POST` | `/api/campaigns` | Yes | Deploys a new protocol |
-| `PUT` | `/api/campaigns/:id` | Yes | Updates an existing protocol without recreating |
-| `PATCH` | `/api/campaigns/:id/toggle` | Yes | Toggles protocol active/paused state |
-| `DELETE` | `/api/campaigns/:id` | Yes | Permanently terminates a protocol |
-| `GET` | `/api/comments` | Yes | Classified telemetry buffer (last 25 signals) |
-| `GET` | `/webhook` | No | Meta Webhook verification handshake |
-| `POST` | `/webhook` | No | Meta Webhook ingress for Instagram comment events |
-| `GET` | `/shelly_logo.png` | No | High-res brand asset |
-| `GET` | `/favicon.png`, `/favicon.ico` | No | Browser tab iconography |
-
----
-
-### 5. Anti-Spam Safety & Rate-Limiting Engine (`src/messageQueue.js`)
-
-To preserve Instagram account health and avoid spam detection during viral comment surges, all outbound DMs flow through an asynchronous safety queue:
-
-1. **Humanized Jitter:** Each message is dispatched with a randomized delay between **2,500ms and 6,500ms**.
-2. **Hourly Safety Quota:** Hard cap of **60 DMs per hour**. If reached, the queue automatically enters a 5-minute cool-down.
-3. **Daily Safety Quota:** Hard cap of **300 DMs per 24-hour rolling window**.
-4. **Intelligent Circuit Breaker:** If Meta returns rate-limiting error codes (`(#4)`, `(#17)`, `(#32)`), the queue trips the circuit breaker and pauses all automated outbound messaging for **30 minutes**, logging the cool-down expiration time.
-
----
-
-### 6. User Interface & Cyberdeck Features (`dashboard.html` / `index.html`)
-
-- **Iron Man / Jarvis HUD Aesthetics:** Dark glassmorphism (`#04070d`), cyan energy glow (`#00f0ff`), animated particle constellation background, and synthesized Web Audio clicks.
-- **Protocol State Draft Saver:** Auto-persists typed form inputs into `localStorage.natc_protocol_draft` in real-time. If the modal is accidentally closed, drafts are restored on reopen and cleared only upon successful protocol deployment.
-- **Protocol Preset Defaults:** Configurable default values (`localStorage.natc_protocol_defaults`) accessible via `⚙ PROTOCOL DEFAULTS` on the dashboard and `⚡ LOAD PRESET DEFAULTS` in the modal.
-- **Dual Live HUD Preview:**
-  - *Public Comment Thread:* Renders the simulated follower comment and the verified bot public reply in real-time.
-  - *Follower DM Inbox:* Live renders both **Button Mode (Image 2 style)** and **Hero Card Mode (Image 1 style)** with domain target extraction.
-- **Reel Inventory Carousel:**
-  - Fetches the creator's published reels via Meta Graph API.
-  - Horizontal swipe carousel with video thumbnails and first-line captions.
-  - Tap-to-lock on any reel, or 1-click `★ ALL REELS (GLOBAL)` button.
-- **Locked Reel Banner (Step 2):**
-  - Displays the reel cover thumbnail.
-  - Displays the **first line alone** of the reel caption (clean, non-truncated multi-line text).
-  - Shows the Node ID and an `[✕ UNLOCK]` button.
-- **Protocol Card Management:**
-  - Displays codename, target reel name (first-line caption), keywords, DM type, and status switch.
-  - `[ ✏ EDIT ]` Button: Reopens the protocol modal in edit mode, pre-fills all fields, auto-loads the reel inventory, and sends `PUT /api/campaigns/:id`.
-  - `[ TERMINATE ]` Button: Permanently removes the protocol from SQLite and purges browser localStorage backup to prevent resurrection.
-- **Mobile HUD Quick-Scroll Elevator:** Floating right-edge cyber pill with `▲` and `▼` smooth-scroll controls and a cyan position indicator thumb.
+#### System Characteristics & Architecture:
+* **Directory:** `C:\temp\PROJECT-SHELLY` (Legacy `project-jarvis` preserved as untouched baseline reference).
+* **Native Win32 Executable `SHELLY.exe` & Permanent Pinning (Phase 13):**
+  * Dedicated C executable compiled with GCC & Windres. Resource ID 1 (`IDI_APPLICATION`) embeds `shelly_logo.ico`.
+  * Running process is `SHELLY.exe`. Windows taskbar groups and pins `SHELLY.exe` with the cyan arc-reactor icon under all conditions.
+* **Continuous 16kHz PyAudio Acoustic Sensor & Multi-Turn Session (Phase 14):**
+  * **Root Cause of Prior Hearing Issues:** `speech_recognition.listen()` blocked the main thread in 3-8s chunks, never streamed real-time RMS, and dropped any sentence that did not contain "SHELLY".
+  * **New PyAudio Stream:** Reads 512 samples (32ms frames) non-blocking at 16000Hz on the user's USB microphone (`Microphone (USBAudio1.0)`).
+  * **18-Second Multi-Turn Conversation Session:** Saying "SHELLY" opens an active conversational window. During this active session, NatC speaks naturally without having to say "SHELLY" every single time! Each speech interaction resets the 18s timer.
+  * **Auto-Dynamic Noise Floor Tracker:** Continuously profiles ambient room sound (`noise_floor = noise_floor * 0.985 + chunk_rms * 0.015`) and auto-adjusts the threshold gate (`threshold = max(26.0, noise_floor * 1.45)`).
+  * **Acoustic Presets:** `AUTO-ADAPT` (recommended), `QUIET (40)`, `DESK (65)`, `STUDIO (110)`.
+  * **Live Vibration Waveform Canvas (`micVibrationCanvas`):**
+    * Flat motionless line with cyber grid when quiet.
+    * Real-time green oscillating waveform strictly proportional to voice volume when NatC speaks!
+    * Live meter bar with sliding yellow gate marker line and `● VOICE CAPTURED // HEARING BOSS` status badge.
+* **Expressive Human Neural Voices — Zero Robotic Slop (Phase 14):**
+  * **Root Cause of Robotic Fallback:** Gemini TTS preview endpoint has a 10 requests/day free tier quota limit. When hit, it returned HTTP 429, causing the old engine to fall back to Microsoft Hazel (SAPI5).
+  * **Solution:** Upgraded to `edge-tts 7.3.1` (resolving Microsoft websocket 403 changes) and made **Microsoft Edge Neural Voice (`en-US-AvaNeural`)** the primary default.
+  * **Voices Available:**
+    * `Ava (Warm & Natural) [Recommended]` (`en-US-AvaNeural`) — Expressive, warm, realistic human female voice.
+    * `Sonia (Sophisticated Co-Pilot)` (`en-GB-SoniaNeural`) — Crisp, sophisticated British accent.
+    * `Emma (Bright & Expressive)` (`en-US-EmmaNeural`) — Clear, friendly, articulate.
+    * `Jenny (Clear & Conversational)` (`en-US-JennyNeural`).
+    * `Aoede (Studio Neural)` / `Kore (Crisp Neural)` on Gemini TTS with automatic fallback to Ava on 429.
+  * Zero robotic SAPI5 Microsoft Hazel fallback!
+* **Cool Intellectual Friend Personality (Phase 14):**
+  * Completely purged cheesy 1980s spaceship checklist dialogue ("propulsion and defense systems are green across the board").
+  * Conversational prompt re-engineered: SHELLY is NatC's sharp, witty, supportive intellectual partner and friend who talks in concise, natural, warm conversational prose.
+  * Multi-turn conversation memory (last 16 messages).
+  * Instant fast-path responses for "can you hear me", "who are you", jokes, greetings.
+* **32-Bar Visualizer & Arc Reactor Pulse (Phase 14):**
+  * When SHELLY speaks: 32 bars actively pulse, dance, and modulate to her speech output! Arc reactor core expands and outer rings spin faster! Status: `SHELLY SPEAKING // AUDIO EMISSION`.
+  * When NatC speaks: 32 bars vibrate to his voice in bright neon green! Status: `HEARING BOSS // CAPTURING VOICE`.
+  * When in active session: Status displays `ACTIVE SESSION // LISTENING TO BOSS (18s)`.
+  * When in standby: Calm, gentle ambient ripple, `STANDBY // LISTENING`.
+* **Hybrid Hardware Engine (`core/hardware_profiler.py`):**
+  * Auto-detects NVIDIA GeForce RTX 3050 Laptop GPU (60 FPS WebGL) vs CPU Efficiency (<1% CPU, 30 FPS).
+* **Instagram Mission Control Bridge (`core/instagram_bridge.py`):**
+  * Live REST connector to Render (`https://insta-stuff.onrender.com`).
+  * Synchronizes published reels, video thumbnails, captions, active protocols, and allows one-click pause/resume/termination.
 
 ---
 
-### 7. Chronological Changelog & Historical Evolution
+### 4. Chronological Implementation Phases
 
-#### Phase 1: Inception & Core Automation Engine
-- Established Express backend, SQLite database, and webhook verification for Instagram Graph API.
-- Implemented real-time comment ingestion and matching against configured keyword protocols.
-- Added public comment reply and private DM dispatch.
-
-#### Phase 2: Cyberdeck HUD Dashboard & Security
-- Built Stark Industries / Jarvis holographic UI with responsive design.
-- Added JWT-based security clearance (`/login`, `/dashboard`).
-- Implemented telemetry live feed buffer for processed comments.
-
-#### Phase 3: Cloud Deployment & Render Keep-Alive
-- Containerized and deployed to Render cloud (`https://insta-stuff.onrender.com`).
-- Configured cron keep-alive self-ping (`/api/ping`) to prevent Render free-tier spinning down.
-- Built persistent backup sync (`campaigns_backup.json`) to protect against ephemeral disk wipes.
-
-#### Phase 4: State Preservation & Default Presets
-- Added `localStorage` input draft auto-saver (`natc_protocol_draft`).
-- Added Protocol Defaults Manager (`⚙ PROTOCOL DEFAULTS`) and `⚡ LOAD PRESET DEFAULTS` auto-filler.
-
-#### Phase 5: Button DM Delivery & Dual Live Simulation
-- Engineered Instagram Button Template (Image 2 style: native chat bubble with `Click ✅` button, zero bulky image card).
-- Created Dual Live Simulation in protocol initialization modal (simulating both public comments and private DMs in real time).
-
-#### Phase 6: Protocol Termination Bugfix & Edit Protocol Mode
-- Resolved protocol resurrection bug where deleting all campaigns caused client backup to auto-restore terminated campaigns.
-- Added `PUT /api/campaigns/:id` backend route and `updateCampaign` database function.
-- Added `[ ✏ EDIT ]` button on protocol cards with full data pre-population.
-- Purged inappropriate peach emojis (`🍑`) across templates, placeholders, and databases.
-- Added cyan-glow page scrollbar and floating mobile Quick-Scroll HUD elevator.
-
-#### Phase 7: S.H.E.L.L.Y Brand Identity & Safety Quotas
-- Embedded official SHELLY logo inside the arc-reactor on dashboard and login screens.
-- Added favicon and touch-icon endpoints (`/favicon.png`, `/favicon.ico`, `/shelly_logo.png`, `/apple-touch-icon.png`).
-- Upgraded `MessageQueue` with humanized jitter (2.5s - 6.5s), 60/hr and 300/day quotas, and a 30-minute rate-limit circuit breaker.
-- Integrated desktop bridge connecting `C:\temp\project-jarvis` to the live SaaS server.
-
-#### Phase 8 (Current): Target Reel First-Line Caption & Edit Inventory Sync
-- **Bug Fixed:** In Edit Protocol modal, `loadRecentMedia()` was not triggered, causing the carousel to stay on "Connecting to Meta Media Inventory..." and the locked reel banner to fall back to a raw "ID" placeholder.
-- **Fix Applied:** `openEditCampaignModal()` now asynchronously ensures `recentMediaCache` is loaded, populates the carousel, highlights the selected reel, and synchronizes the locked banner.
-- **First-Line Caption Alone:** Added `getFirstLine()` formatting helper so that both the locked reel banner and dashboard protocol cards display the clean **first line alone** of the reel caption rather than raw numeric IDs or multi-line caption blobs.
-- **Database Enhancement:** Added `media_caption` column to `campaigns` table in `src/db.js` and updated `src/server.js` (`POST` and `PUT`) so the reel caption is persisted permanently.
-- **Desktop Parity:** Updated `C:\temp\project-jarvis` protocol panel and conversational engine to also extract and use the first line of the reel caption.
-- **Living Memory:** Created this `current_state.md` persistent tracking document.
-
-#### Phase 9: Complete Elimination of "ID" Box & Dynamic Reel Thumbnail Resolution
-- **User Problem Addressed:** In the "Locked onto target reel" banner, a black box showing the text "ID" was displayed instead of the reel's thumbnail, and "TARGET REEL // (numeric ID)" appeared instead of the reel caption.
-- **"ID" Box Completely Eliminated:** Removed the hardcoded SVG text placeholder with the letters "ID". The banner now always displays the actual reel video thumbnail image. If the image is still loading or resolving, a sleek neon video play icon (`▶`) on a dark card is displayed as a fallback, NEVER the text "ID".
-- **Added `media_thumbnail_url` Column:** Added schema migration `ALTER TABLE campaigns ADD COLUMN media_thumbnail_url TEXT;` to SQLite in `src/db.js` and updated `createCampaign()` and `updateCampaign()`.
-- **Single Reel Meta Fetcher (`GET /api/media/:id`):** Added `getMediaDetails(mediaId)` in `src/instagramApi.js` and endpoint `GET /api/media/:id` in `src/server.js`. The frontend and backend can now fetch the full thumbnail and caption for ANY reel ID on demand.
-- **Server-Side Auto-Backfill:** In `GET /api/campaigns`, the server automatically detects any protocols with missing `media_caption` or `media_thumbnail_url` and backfills them asynchronously from the Meta Media inventory, permanently saving them to the database.
-- **Dashboard Card Labeling:** Protocol cards now display the exact first line of the caption (e.g. `TARGET REEL // "Made this reel a month ago 😭"`), completely eliminating raw numeric IDs from the creator's view.
-
-#### Phase 10: Live Render Protocol Audit & Meta Media Inventory Inspection
-- **Audit Performed:** Polled live Render deployment (`https://insta-stuff.onrender.com/api/campaigns`) and verified active protocols against Meta Graph API v21.0 media inventory.
-- **Render Active Protocols Found:**
-  1. Protocol `ID 10`: `LATEST_REEL_PEAK_AUTONOMY` -> Locked to Reel `18149632603558915` (Caption: `Comment "peak" guys`), triggers: `peak, link, hi`, Link Button: `Click ✅` -> `https://www.instagram.com/thenatrants/`. Status: **ACTIVE (1)**.
-  2. Protocol `ID 2`: `STARTUP_REEL_AUTONOMY` -> Locked to Reel `17906571819546262` (Caption: `Render is Peak Browskis❤️‍🔥`), triggers: `peak, hi`, Link Button: `Click ✅` -> `https://www.instagram.com/thenatrants/`. Status: **ACTIVE (1)**.
-  3. Protocol `ID 1`: `summa1` -> Locked to Reel `17906571819546262` (Caption: `Render is Peak Browskis❤️‍🔥`), triggers: `peak`, Plain text DM format. Status: **ACTIVE (1)**.
-- **Ephemeral Storage Root Cause Clarified:** On Render free-tier, cold boots/redeploys restore from Git `campaigns_backup.json`. Any protocol created solely through the browser UI that wasn't committed to `campaigns_backup.json` is not restored after a Render container rebuild. Meta Graph API stores reels, comments, and messages, but does not store automation protocols.
-- **Meta Recent Media Verified (Top 3 Reels):**
-  1. `17894947332683329` (2026-10-31): `Misconceptions Pavangal 😭🥀`
-  2. `18115057424129042` (2026-10-30): `Made this reel a month ago 😭`
-  3. `18144025210613418` (2026-10-28): `Avg Male obsession 🤩`
-
-#### Phase 11 (Current): Legacy Protocols Purged & Pixel Pet Automation Verification
-- **User Instruction Executed:** Purged all old test protocols (`summa1`, `STARTUP_REEL_AUTONOMY`, `LATEST_REEL_PEAK_AUTONOMY`).
-- **Live Render Purge:** Authenticated via REST API and deleted protocols `1`, `2`, and `10` from Render. Verified `GET /api/campaigns` returns `[]`.
-- **Local DB & Git Backup Sync:** Cleared protocols from local `bot_data.sqlite` and updated `campaigns_backup.json` to `[]`. Render cold-boots will never restore legacy protocols again.
-- **Root Cause & Auto-Reply Mystery Resolved:**
-  - Investigated Meta Graph API comments on Reel `18115057424129042` (`Made this reel a month ago 😭`).
-  - Confirmed that at `2026-10-30T13:58:43Z`, a user commented `"pet"`, and at `13:58:49Z`, S.H.E.L.L.Y (@thenatrants) successfully auto-replied `"Thanks for commenting 😍...check your dm✌️"`.
-  - The other protocols didn't work because `src/bot.js` enforces strict safety (`findCampaignForMedia(mediaId)`) preventing replies if the incoming comment's reel doesn't match the campaign's locked reel ID. Since the other protocols targeted older October reels, they silently ignored new reels.
-  - When the recent commit was pushed, Render cold-booted, restored the 3 old fixtures from `campaigns_backup.json`, and erased the temporary `Pixel pet` record from the ephemeral disk. Ready to permanently anchor `Pixel pet`.
+| Phase | Milestone / Focus | Details |
+|---|---|---|
+| **Phase 1** | Two-Branch Architecture Inception | Split between Web SaaS (`insta_auto_reply_shii`) and Desktop Cockpit. |
+| **Phase 2** | Full Rebranding (JARVIS -> SHELLY) | Replaced legacy references across code, UI headers, and voice prompts. |
+| **Phase 3** | Wake Word & Mic Overhaul | Calibrated noise floor (65.0 RMS) and added phonetic aliases. |
+| **Phase 4** | Gemini Failover Pool | Added multi-key rotation on HTTP 429. |
+| **Phase 5** | Settings Deck | Built voice selection and key management. |
+| **Phase 6** | Arc-Reactor Logo Pipeline | Multi-resolution ICO/PNG assets generated from 2048x2048 master. |
+| **Phase 7** | Windows Taskbar Icon Fix | Registered AppUserModelID `natc.shelly.cockpit.2.0` and dispatched Win32 `WM_SETICON`. |
+| **Phase 8** | ElevenLabs Voice Integration | Built ElevenLabs engine with SAPI5 fallback. |
+| **Phase 9** | Living Memory System | Created `current_state.md` to permanently preserve context. |
+| **Phase 10** | Voice Root Cause & Gemini TTS Discovery | Discovered Edge-TTS 403 error. Tested and verified Gemini native studio TTS producing 24kHz studio audio with NatC's existing Gemini key. |
+| **Phase 11** | Tony Stark Mark-VII Tactical Modernization | Migrated to `C:\temp\PROJECT-SHELLY`. Built authentic Stark Industries HUD (zero AI slop, no emojis, obsidian carbon background, rotating vector arc reactor, 32-bar oscilloscope). Engineered hybrid GPU/CPU adaptive engine. |
+| **Phase 12** | Voice Cadence Calibration & Direct GUI Launch | Resampled Gemini TTS to 44.1kHz Stereo (eliminated Donald Duck pitch shift). Repointed Desktop shortcut to eliminate terminal popup. |
+| **Phase 13** | Permanent Native Binary `SHELLY.exe` & Taskbar Pinning Resolution | Compiled native Win32 `SHELLY.exe` with embedded `shelly_logo.ico`. Purged legacy `Python.lnk` and bound AUMID `natc.shelly.cockpit.2.0` to HWNDs and taskbar pins. |
+| **Phase 14** | Expressive Human Neural Voices & Continuous PyAudio Engine | **Zero Robotic Slop:** Upgraded `edge-tts 7.3.1` and set `Ava (Warm & Natural)` as primary default. Continuous PyAudio stream + 18s multi-turn conversational session. Live vibration canvas + auto-dynamic noise gate. |
+| **Phase 15** | Taskbar Stacking Liberation & Groq Whisper Turbo Overhaul | **Taskbar Fix:** Cleared rogue AUMID `natc.shelly.cockpit.2.0` from 188 foreign windows and 14 Discord windows; restored Discord (`com.squirrel.Discord.Discord`) and Antigravity (`electron.app.Antigravity`). Added active desktop scrubber. **Zero Sitting Quiet:** Integrated Groq Whisper Large V3 Turbo (<0.35s STT) and leaky-integrator noise floor tracker that never locks up. Upgraded LLM brain to Groq Qwen 3.8 27B (<0.3s response, eliminating reasoning token exhaustion). Fixed punctuation bug so 'Shelly,', 'Shelly.' always trigger wake word. |
+| **Phase 16 (Current)** | Cross-Platform Generic Template Card & Text Alignment Overhaul | **Problem Fixed:** Instagram Web (Desktop Browser) stripped buttons from Meta `button` templates, and text bubbles were cluttered with raw URL line breaks (`Click ✅: https://... /download`). **Solution Applied:** Migrated `sendPrivateReply` to Meta's **Generic Template** (`template_type: 'generic'`). Renders perfectly aligned cards with bold titles, subtitles, and interactive buttons on BOTH Mobile and Desktop Web (identical to Image 1). Integrated `default_action` so clicking the card anywhere opens the link. Stripped raw URLs from message bodies to ensure pristine typography. Backfilled `Pixel pet` into `campaigns_backup.json` and deployed. |
 
 ---
 
-### 8. Direct Instructions for Future Prompts
-1. Whenever modifying backend routes, database columns, or frontend controls, **always verify both `src/public/dashboard.html` and `src/public/index.html`** to keep them identical.
-2. Ensure `node -c` syntax validation passes before committing.
-3. Update this `current_state.md` file immediately upon completing any requested modification.
+### 5. Verification & Launch Instructions
+
+#### Launching the S.H.E.L.L.Y Mark-VII Cockpit:
+1. **Direct Launch (Recommended):** Double-click the **SHELLY** shortcut on your Windows Desktop, or run `C:\temp\PROJECT-SHELLY\SHELLY.exe`. Opens directly into the software interface with **ZERO command prompt terminal windows**.
+2. **From Terminal / Web Folder:**
+   ```cmd
+   cd C:\temp\PROJECT-SHELLY
+   .\LAUNCH_SHELLY.bat
+   ```
+
+#### Verification Checklist:
+* **Microphone Live Vibrations:** Talk into your USB microphone — the **Microphone Vibration Canvas** in the right panel immediately bounces with green oscillating waveforms proportional to your voice intensity.
+* **Auto-Dynamic Gate:** Watch the room noise floor (e.g. `20 RMS`) and yellow gate marker line adjust automatically. When you speak, the bar crosses the yellow line and lights up `● VOICE CAPTURED // HEARING BOSS`.
+* **Multi-Turn Conversation:** Say *"SHELLY"* once. After she responds, speak again immediately (*"can you hear me"*, *"who are you"*) — she responds directly without needing to say *"SHELLY"* again!
+* **Expressive Human Voice:** SHELLY speaks in `Ava (Warm & Natural)` — an ultra-realistic, warm, breathe-inflected female human voice with zero 2010 robotic SAPI5 slop.
+* **Oscilloscope Sound Waves:** Above `STATUS: STANDBY // LISTENING`, the 32 frequency bars dance actively to SHELLY's voice output while the Arc Reactor core flares and pulses.

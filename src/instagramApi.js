@@ -31,96 +31,103 @@ async function replyToComment(commentId, replyText) {
 }
 
 /**
- * Send a private DM to the commenter (Supports Clean Button Template or Plain Text).
+ * Send a private DM to the commenter using Meta's Generic Template.
+ * Fully cross-platform: Renders interactive button cards identically on
+ * Mobile (iOS/Android) and Desktop Web Browser (Instagram Web).
  */
 async function sendPrivateReply({ commentId, userId, messageText, cardConfig }) {
-  // Option A: Send Interactive Link Button (Image 2 style: Clean text bubble + Click button)
+  // Option A: Send Interactive Link Card / Button
   if (cardConfig && cardConfig.buttonUrl) {
-    const btnTitle = String(cardConfig.buttonText || 'Click ✅').slice(0, 20);
-    const textContent = (messageText || cardConfig.title || 'Tap the link below:').trim();
+    const btnTitle = String(cardConfig.buttonText || 'Click ✅').trim().slice(0, 20) || 'Click ✅';
+    const targetUrl = String(cardConfig.buttonUrl).trim();
+
+    // Helper: Clean raw URLs or "Click ✅: http..." out of message text to prevent ugly line breaks and duplicates
+    const cleanMsg = (messageText || '')
+      .replace(/(?:click\s*✅?|link|here):\s*https?:\/\/\S+/gi, '')
+      .replace(/https?:\/\/\S+/gi, '')
+      .trim();
+
+    let title = (cardConfig.title || '').trim();
+    let subtitle = (cardConfig.subtitle || '').trim();
+
+    if (!title) {
+      if (cleanMsg) {
+        // Split on newline or period to separate header and description cleanly
+        const lines = cleanMsg.split('\n').map(l => l.trim()).filter(Boolean);
+        title = lines[0];
+        if (!subtitle && lines.length > 1) {
+          subtitle = lines.slice(1).join(' ');
+        }
+      } else {
+        title = 'Here is your link! 🚀';
+      }
+    }
+
+    if (!subtitle) {
+      subtitle = 'Tap the button below to open 👇';
+    }
+
+    // Meta API character limits: title and subtitle max 80 chars
+    title = title.slice(0, 80);
+    subtitle = subtitle.slice(0, 80);
 
     if (config.DRY_RUN) {
-      console.log(`[DRY RUN] Would send Link Button DM to user ${userId} for comment ${commentId}:`);
-      console.log(`Text: "${textContent}" | Button: [${btnTitle}] -> ${cardConfig.buttonUrl}`);
-      return { success: true, dry_run: true, format: 'button' };
+      console.log(`[DRY RUN] Would send Generic Template DM to user ${userId} for comment ${commentId}:`);
+      console.log(`Title: "${title}" | Subtitle: "${subtitle}" | Button: [${btnTitle}] -> ${targetUrl}`);
+      return { success: true, dry_run: true, format: 'card' };
     }
 
     const recipient = commentId ? { comment_id: commentId } : { id: userId };
     const url = `${BASE_URL}/me/messages`;
 
-    // Try 1: Button Template (Direct Instagram chat bubble with button at bottom - exactly like Image 2)
-    if (!cardConfig.imageUrl) {
-      try {
-        const buttonPayload = {
-          recipient,
-          message: {
-            attachment: {
-              type: 'template',
-              payload: {
-                template_type: 'button',
-                text: textContent,
-                buttons: [
-                  {
-                    type: 'web_url',
-                    url: cardConfig.buttonUrl.trim(),
-                    title: btnTitle
-                  }
-                ]
-              }
-            }
-          }
-        };
+    // Construct Generic Template Element (Works on both Mobile AND Desktop Web)
+    const element = {
+      title,
+      subtitle,
+      default_action: {
+        type: 'web_url',
+        url: targetUrl
+      },
+      buttons: [
+        {
+          type: 'web_url',
+          url: targetUrl,
+          title: btnTitle
+        }
+      ]
+    };
 
-        const res = await axios.post(url, buttonPayload, {
-          headers: { 'Content-Type': 'application/json' },
-          params: { access_token: config.PAGE_ACCESS_TOKEN }
-        });
-
-        console.log(`✅ [Meta API] Clean Button DM successfully delivered to comment ${commentId}`);
-        return { success: true, data: res.data, format: 'button' };
-      } catch (btnErr) {
-        console.warn(`⚠️ [Meta API] Button template notice (${btnErr.response?.data?.error?.message || btnErr.message}). Trying generic element format...`);
-      }
+    if (cardConfig.imageUrl) {
+      element.image_url = cardConfig.imageUrl.trim();
     }
 
-    // Try 2: Generic Template (no image header unless explicitly specified)
-    try {
-      const genericPayload = {
-        recipient,
-        message: {
-          attachment: {
-            type: 'template',
-            payload: {
-              template_type: 'generic',
-              elements: [
-                {
-                  title: (cardConfig.title || textContent).slice(0, 80),
-                  ...(cardConfig.subtitle ? { subtitle: cardConfig.subtitle.slice(0, 80) } : (textContent.length > 80 ? { subtitle: textContent.slice(80, 160) } : {})),
-                  ...(cardConfig.imageUrl ? { image_url: cardConfig.imageUrl } : {}),
-                  buttons: [
-                    {
-                      type: 'web_url',
-                      url: cardConfig.buttonUrl.trim(),
-                      title: btnTitle
-                    }
-                  ]
-                }
-              ]
-            }
+    const genericPayload = {
+      recipient,
+      message: {
+        attachment: {
+          type: 'template',
+          payload: {
+            template_type: 'generic',
+            elements: [element]
           }
         }
-      };
+      }
+    };
 
+    try {
       const res = await axios.post(url, genericPayload, {
         headers: { 'Content-Type': 'application/json' },
         params: { access_token: config.PAGE_ACCESS_TOKEN }
       });
 
-      console.log(`✅ [Meta API] Generic Template DM successfully delivered to comment ${commentId}`);
+      console.log(`✅ [Meta API] Interactive Generic Card DM delivered to ${commentId || userId} (Title: "${title}", Button: "${btnTitle}")`);
       return { success: true, data: res.data, format: 'card' };
     } catch (genericErr) {
-      console.warn(`⚠️ [Meta API] Generic template rejected. Falling back to clean text DM...`);
-      const fallbackText = `${textContent}\n\n${btnTitle}: ${cardConfig.buttonUrl}`;
+      const errorMsg = genericErr.response?.data?.error?.message || genericErr.message;
+      console.warn(`⚠️ [Meta API] Generic template notice (${errorMsg}). Falling back to clean text DM...`);
+
+      // Fallback: Send clean text with link pointer
+      const fallbackText = `${title}\n\n${subtitle}\n\n👉 ${targetUrl}`;
       return await sendPrivateReply({
         commentId,
         userId,
