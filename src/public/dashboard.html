@@ -486,6 +486,7 @@
       margin-bottom: 16px;
       white-space: pre-wrap;
       word-break: break-word;
+      overflow-wrap: anywhere;
       max-height: 90px;
       overflow-y: auto;
     }
@@ -1430,6 +1431,7 @@
         max-height: 80px !important;
         max-width: 100% !important;
         word-break: break-word !important;
+        overflow-wrap: anywhere !important;
       }
 
       .camp-footer {
@@ -1471,12 +1473,13 @@
         overflow: hidden !important;
       }
 
-      input[type="text"], textarea {
-        font-size: 14px !important;
-        padding: 10px 8px !important;
+      input[type="text"], textarea, select {
+        font-size: 16px !important; /* Prevents unwanted iOS Safari viewport auto-zoom */
+        padding: 10px 10px !important;
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
+        -webkit-appearance: none;
       }
 
       .preset-chips-row {
@@ -2741,7 +2744,11 @@
         let hasData = false;
         if (draft.title) { document.getElementById('campTitle').value = draft.title; hasData = true; }
         if (draft.keywords) { document.getElementById('campKeywords').value = draft.keywords; hasData = true; }
-        if (draft.dmText) { document.getElementById('campDmText').value = draft.dmText; hasData = true; }
+        if (draft.dmText) {
+          const cleanDraftDm = draft.dmText.replace(/(?:click\s*✅?|link|here):\s*https?:\/\/\S+/gi, '').replace(/https?:\/\/\S+/gi, '').trim();
+          document.getElementById('campDmText').value = cleanDraftDm;
+          hasData = true;
+        }
         if (draft.publicReply) { document.getElementById('campPublicReply').value = draft.publicReply; hasData = true; }
         if (draft.manualMedia) {
           const mInput = document.getElementById('manualMediaInput');
@@ -2950,7 +2957,11 @@
         document.getElementById('campCardBtnUrlHero').value = campaign.card_button_url || '';
         document.getElementById('campCardImageUrl').value = campaign.card_image_url || '';
       } else {
-        document.getElementById('campDmText').value = campaign.dm_text || '';
+        const cleanedDmText = (campaign.dm_text || '')
+          .replace(/(?:click\s*✅?|link|here):\s*https?:\/\/\S+/gi, '')
+          .replace(/https?:\/\/\S+/gi, '')
+          .trim();
+        document.getElementById('campDmText').value = cleanedDmText;
         document.getElementById('campCardBtnUrl').value = campaign.card_button_url || '';
         document.getElementById('campCardBtnText').value = campaign.card_button_text || 'Click ✅';
       }

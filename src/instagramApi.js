@@ -31,6 +31,62 @@ async function replyToComment(commentId, replyText) {
 }
 
 /**
+ * Format title and subtitle cleanly from user input, guaranteeing
+ * sentence boundaries, word-boundary protection, and Meta's 80-char limit.
+ */
+function formatCardCopy(cleanMsg, configuredTitle, configuredSubtitle) {
+  let title = (configuredTitle || '').trim();
+  let subtitle = (configuredSubtitle || '').trim();
+
+  if (title) {
+    if (!subtitle) {
+      subtitle = cleanMsg || 'Tap the button below to open 👇';
+    }
+  } else if (cleanMsg) {
+    const lines = cleanMsg.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length > 1) {
+      title = lines[0];
+      subtitle = lines.slice(1).join(' ');
+    } else {
+      if (cleanMsg.length <= 75) {
+        title = cleanMsg;
+        subtitle = subtitle || 'Tap the button below to open 👇';
+      } else {
+        const sentenceMatch = cleanMsg.match(/^(.{20,75}?[.!?])\s+(.+)$/);
+        if (sentenceMatch) {
+          title = sentenceMatch[1];
+          subtitle = sentenceMatch[2];
+        } else {
+          const cutIdx = cleanMsg.lastIndexOf(' ', 75);
+          if (cutIdx > 20) {
+            title = cleanMsg.slice(0, cutIdx).trim();
+            subtitle = cleanMsg.slice(cutIdx).trim();
+          } else {
+            title = cleanMsg.slice(0, 75).trim();
+            subtitle = cleanMsg.slice(75).trim();
+          }
+        }
+      }
+    }
+  } else {
+    title = 'Here is your link! 🚀';
+    subtitle = 'Tap the button below to open 👇';
+  }
+
+  // Ensure neither exceeds 80 characters without cutting words awkwardly
+  if (title.length > 80) {
+    const cut = title.lastIndexOf(' ', 76);
+    title = (cut > 20 ? title.slice(0, cut) : title.slice(0, 77)) + '...';
+  }
+  if (subtitle.length > 80) {
+    const cut = subtitle.lastIndexOf(' ', 76);
+    subtitle = (cut > 20 ? subtitle.slice(0, cut) : subtitle.slice(0, 77)) + '...';
+  }
+
+  return { title, subtitle };
+}
+
+/**
  * Send a private DM to the commenter using Meta's Generic Template.
  * Fully cross-platform: Renders interactive button cards identically on
  * Mobile (iOS/Android) and Desktop Web Browser (Instagram Web).
@@ -39,7 +95,10 @@ async function sendPrivateReply({ commentId, userId, messageText, cardConfig }) 
   // Option A: Send Interactive Link Card / Button
   if (cardConfig && cardConfig.buttonUrl) {
     const btnTitle = String(cardConfig.buttonText || 'Click ✅').trim().slice(0, 20) || 'Click ✅';
-    const targetUrl = String(cardConfig.buttonUrl).trim();
+    let targetUrl = String(cardConfig.buttonUrl).trim();
+    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+      targetUrl = 'https://' + targetUrl;
+    }
 
     // Helper: Clean raw URLs or "Click ✅: http..." out of message text to prevent ugly line breaks and duplicates
     const cleanMsg = (messageText || '')
@@ -47,29 +106,7 @@ async function sendPrivateReply({ commentId, userId, messageText, cardConfig }) 
       .replace(/https?:\/\/\S+/gi, '')
       .trim();
 
-    let title = (cardConfig.title || '').trim();
-    let subtitle = (cardConfig.subtitle || '').trim();
-
-    if (!title) {
-      if (cleanMsg) {
-        // Split on newline or period to separate header and description cleanly
-        const lines = cleanMsg.split('\n').map(l => l.trim()).filter(Boolean);
-        title = lines[0];
-        if (!subtitle && lines.length > 1) {
-          subtitle = lines.slice(1).join(' ');
-        }
-      } else {
-        title = 'Here is your link! 🚀';
-      }
-    }
-
-    if (!subtitle) {
-      subtitle = 'Tap the button below to open 👇';
-    }
-
-    // Meta API character limits: title and subtitle max 80 chars
-    title = title.slice(0, 80);
-    subtitle = subtitle.slice(0, 80);
+    const { title, subtitle } = formatCardCopy(cleanMsg, cardConfig.title, cardConfig.subtitle);
 
     if (config.DRY_RUN) {
       console.log(`[DRY RUN] Would send Generic Template DM to user ${userId} for comment ${commentId}:`);
@@ -98,7 +135,11 @@ async function sendPrivateReply({ commentId, userId, messageText, cardConfig }) 
     };
 
     if (cardConfig.imageUrl) {
-      element.image_url = cardConfig.imageUrl.trim();
+      let imgUrl = String(cardConfig.imageUrl).trim();
+      if (!imgUrl.startsWith('http://') && !imgUrl.startsWith('https://')) {
+        imgUrl = 'https://' + imgUrl;
+      }
+      element.image_url = imgUrl;
     }
 
     const genericPayload = {
