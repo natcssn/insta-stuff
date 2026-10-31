@@ -199,7 +199,7 @@ To preserve Instagram account health and avoid spam detection during viral comme
 - **Server-Side Auto-Backfill:** In `GET /api/campaigns`, the server automatically detects any protocols with missing `media_caption` or `media_thumbnail_url` and backfills them asynchronously from the Meta Media inventory, permanently saving them to the database.
 - **Dashboard Card Labeling:** Protocol cards now display the exact first line of the caption (e.g. `TARGET REEL // "Made this reel a month ago 😭"`), completely eliminating raw numeric IDs from the creator's view.
 
-#### Phase 10 (Current): Live Render Protocol Audit & Meta Media Inventory Inspection
+#### Phase 10: Live Render Protocol Audit & Meta Media Inventory Inspection
 - **Audit Performed:** Polled live Render deployment (`https://insta-stuff.onrender.com/api/campaigns`) and verified active protocols against Meta Graph API v21.0 media inventory.
 - **Render Active Protocols Found:**
   1. Protocol `ID 10`: `LATEST_REEL_PEAK_AUTONOMY` -> Locked to Reel `18149632603558915` (Caption: `Comment "peak" guys`), triggers: `peak, link, hi`, Link Button: `Click ✅` -> `https://www.instagram.com/thenatrants/`. Status: **ACTIVE (1)**.
@@ -210,6 +210,16 @@ To preserve Instagram account health and avoid spam detection during viral comme
   1. `17894947332683329` (2026-10-31): `Misconceptions Pavangal 😭🥀`
   2. `18115057424129042` (2026-10-30): `Made this reel a month ago 😭`
   3. `18144025210613418` (2026-10-28): `Avg Male obsession 🤩`
+
+#### Phase 11 (Current): Legacy Protocols Purged & Pixel Pet Automation Verification
+- **User Instruction Executed:** Purged all old test protocols (`summa1`, `STARTUP_REEL_AUTONOMY`, `LATEST_REEL_PEAK_AUTONOMY`).
+- **Live Render Purge:** Authenticated via REST API and deleted protocols `1`, `2`, and `10` from Render. Verified `GET /api/campaigns` returns `[]`.
+- **Local DB & Git Backup Sync:** Cleared protocols from local `bot_data.sqlite` and updated `campaigns_backup.json` to `[]`. Render cold-boots will never restore legacy protocols again.
+- **Root Cause & Auto-Reply Mystery Resolved:**
+  - Investigated Meta Graph API comments on Reel `18115057424129042` (`Made this reel a month ago 😭`).
+  - Confirmed that at `2026-10-30T13:58:43Z`, a user commented `"pet"`, and at `13:58:49Z`, S.H.E.L.L.Y (@thenatrants) successfully auto-replied `"Thanks for commenting 😍...check your dm✌️"`.
+  - The other protocols didn't work because `src/bot.js` enforces strict safety (`findCampaignForMedia(mediaId)`) preventing replies if the incoming comment's reel doesn't match the campaign's locked reel ID. Since the other protocols targeted older October reels, they silently ignored new reels.
+  - When the recent commit was pushed, Render cold-booted, restored the 3 old fixtures from `campaigns_backup.json`, and erased the temporary `Pixel pet` record from the ephemeral disk. Ready to permanently anchor `Pixel pet`.
 
 ---
 
